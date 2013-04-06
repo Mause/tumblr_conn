@@ -1,0 +1,18 @@
+{% extends "base.html" %} {% block "content" %}
+    <div class="columns centered" style="width: 386px;">
+        <form class="tumblr_blog_form">
+            <label for="blog_name" class="tumblr_blog_input">
+                <input name="blog_name" class="blog_name"/>.tumblr.com
+            </label>
+        </form>
+    </div>
+    <script type="text/javascript">
+    document.onload = function(){
+        $(".blog_name").autoGrowInput({
+            comfortZone: 50,
+            minWidth: 200,
+            maxWidth: 2000
+        });
+    }
+    </script>
+{% endblock %}

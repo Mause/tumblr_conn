@@ -1,0 +1,29 @@
+.tumblr_blog_form {
+    font-size: 30px;
+}
+
+.tumblr_blog_input {
+    font-size: 30px;
+}
+
+.analyse_input {
+    float: left;
+}
+
+.blog_name {
+    font-size: 30px;
+    width: 200px;
+}
+
+.zero_meter {
+    background: #2BA6CB;
+    height: 100%;
+    display: block;
+    width: 0;
+}
+
+.header_custom {
+    margin-left: 10px;
+    font-weight: bold;
+    color: white;
+}

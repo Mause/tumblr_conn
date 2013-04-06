@@ -1,0 +1,21 @@
+{% extends "base.html" %} {% block "content" %}
+<h4>heya!</h4>
+<p>
+    i'm working on {{ blog_name }}.tumblr.com right now, so if you'll give me few minutes to do my job...
+</p>
+
+<div class="twelve columns" id="progress_bar_container">
+    <div class="panel">
+        <p>
+            <div class="progress tree">
+                <span class="zero_meter" id="analysis_progress"></span>
+            </div>
+        </p>
+    </div>
+</div>
+
+<script type="text/javascript">
+    status_url = "/ajax/{{blog_name}}/mapping/status";
+</script>
+<script src="javascripts/analyse_backend.js"></script>
+{% endblock %}
