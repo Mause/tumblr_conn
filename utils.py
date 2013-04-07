@@ -7,9 +7,15 @@ import requests
 import tornado.web
 
 
-class Session(object):
+class Session(dict):
     def __init__(self, handler):
         self.handler = handler
+
+    def get(self, key, default=None):
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            return default
 
     def __getitem__(self, key):
         value = self.handler.get_secure_cookie(key)
