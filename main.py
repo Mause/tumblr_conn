@@ -71,12 +71,11 @@ class MainHandler(BaseHandler):
             self.redirect(auth_url)
             return
 
-        access_key = self.get_secure_cookie('access_key', None)
-        access_secret = self.get_secure_cookie('access_secret', None)
+        access_key = self.session.get('access_key', None)
+        access_secret = self.session.get('access_secret', None)
 
         if not access_secret or not access_key:
-            self.set_secure_cookie('blog_name',
-                self.get_argument('blog_name', None))
+            self.session['blog_name'] = self.get_argument('blog_name', None)
 
             logging.info('oauth_token; {}'.format(
                 tumblr_oauth.request_token['oauth_token']))
