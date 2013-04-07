@@ -84,8 +84,8 @@ class MainHandler(BaseHandler):
 
             self.session['oauth_token'] = str(
                 tumblr_oauth.request_token['oauth_token'])
-            self.session('oauth_token_secret', str(
-                tumblr_oauth.request_token['oauth_token_secret']))
+            self.session['oauth_token_secret'] = str(
+                tumblr_oauth.request_token['oauth_token_secret'])
 
             self.render('auth.html', auth_url=auth_url)
         else:
