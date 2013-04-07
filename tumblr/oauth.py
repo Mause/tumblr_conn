@@ -1,7 +1,8 @@
 # import logging
 import urllib.parse
-# import oauthlib.oauth2
-# import logging
+import oauthlib.oauth1
+
+import logging
 # import code
 import requests
 # import oauth2 as oauth
@@ -26,12 +27,27 @@ class TumblrOAuthClient(OAuth1):
         params = {"oauth_token": self.request_token['oauth_token']}
         return self.AUTHORIZE_URL + "?" + urllib.parse.urlencode(params)
 
+    def get_access_token(self, oauth_verifier, oauth_token=None,
+            oauth_token_secret=None):
+        # token = oauth.Token(
+        # token = oauthlib.oauth2.draft25.tokens.BearerToken.create_token(
+        #     oauth_token or self.request_token['oauth_token'],
+        #     oauth_token_secret or self.request_token['oauth_token_secret'])
+        # token.set_verifier(oauth_verifier)
+        # client = oauthlib.oauth1.Client(self.consumer, token)
 
-    # def get_authorize_url(self):
-    #     url = self.prepare_request_uri(self.AUTHORIZE_URL)
-    #     logging.warning(url)
-    #     return url
-    # pass
+        resp = requests.post(self.ACCESS_TOKEN_URL)
+        # logging.info('Responce; %s' % resp)
+        # logging.info('Content; %s' % content)
+        access_token = dict(urllib.parse.parse_qsl(resp.text))
+        logging.info('access_token; %s' % access_token)
+        if 'oauth_token' not in access_token:
+            raise Exception(str(access_token))
+
+        return oauthlib.oauth2.draft25.tokens.BearerToken.create_token(
+            access_token['oauth_token'],
+            access_token['oauth_token_secret'])
+
 
 
 # class TumblrOAuthClient(object):
