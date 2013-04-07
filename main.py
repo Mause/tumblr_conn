@@ -27,6 +27,7 @@ from itertools import chain, groupby
 
 # third party
 import tornado
+import tornado.options
 
 # from tumblpy import TumblPy
 # from tumblr import TumblrClient
