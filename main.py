@@ -27,6 +27,7 @@ from itertools import chain, groupby
 
 # third party
 import tornado
+import requests
 import tornado.options
 
 # from tumblpy import TumblPy
@@ -139,19 +140,17 @@ class MappingWorker(tornado.web.RequestHandler):
         # token = oauth.Token(access_key, access_secret)
         # consumer = oauth.Consumer(consumer_key, consumer_secret)
         # client = TumblrClient(root_blog_name, consumer, token)
-        client = []
+        # client = []
         params = {'reblog_info': 'true', 'notes_info': 'true'}
         con = []
         json_response = None
+        url = (
+            'http://api.tumblr.com/v2/blog/{hostname}'
+            '/posts'.format(hostname=hostname))
         while not json_response:
             try:
-                json_response = client.make_oauth_request(
-                    'http://api.tumblr.com/v2/blog/{hostname}'
-                    '/posts?api_key={key}&reblog_info=true&'
-                    'notes_info=true&{params}'.format(
-                        hostname=hostname,
-                        key=client.get_api_key(),
-                        params=urllib.parse.urlencode(params)))
+                json_response = requests.get(url, auth=tumblr_oauth,
+                    params=params)
             except http.client.HTTPException as e:
                 logging.info(str(e))
         logging.info(json_response)
@@ -165,7 +164,7 @@ class MappingWorker(tornado.web.RequestHandler):
             source = {}
             for cur_index, post in enumerate(con):
                 returned_data = reblog_path_source(
-                    post['blog_name'], post['id'], client)
+                    post['blog_name'], post['id'], tumblr_oauth)
                 if list(filter(bool, returned_data)):
                     source[post['id']], hostname, post_id = returned_data
                     # memcache.set(str(root_blog_name) + '_source', source)

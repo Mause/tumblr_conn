@@ -66,13 +66,13 @@ class BaseHandler(tornado.web.RequestHandler):
     #     return self.session_store.get_session()
 
 
-def reblog_path_source(hostname, post_id, client):
-    cur_post = client.make_oauth_request(
-        'http://api.tumblr.com/v2/blog/{hostname}.tumblr.com'
-        '/posts?api_key={key}&id={id}&reblog_info=true'.format(
-                hostname=hostname,
-                key=client.get_api_key(),
-                id=post_id))
+def reblog_path_source(hostname, post_id, auth):
+    url = 'http://api.tumblr.com/v2/blog/{hostname}.tumblr.com/posts'.format(
+        hostname=hostname)
+    cur_post = requests.get(url,
+        auth=auth, params={
+            "reblog_info": True,
+            "id": post_id})
 
     # if this post is original to this blog
     if 'reblogged_root_name' not in cur_post['response']['posts'][0]:
@@ -89,12 +89,7 @@ def reblog_path_source(hostname, post_id, client):
     while dest != cur_post['response']['posts'][0]['blog_name']:
         try:
             # request the selected post
-            cur_post = client.make_oauth_request(
-                'http://api.tumblr.com/v2/blog/{hostname}.tumblr.com'
-                '/posts?api_key={key}&id={id}&reblog_info=true'.format(
-                    hostname=hostname,
-                    key=client.get_api_key(),
-                    id=post_id))
+            cur_post = requests.get(url, auth=auth, params={"id": post_id})
         except requests.DownloadError:
             # if any errors occurred, ignore em and try try again
             logging.info('Try try again')
