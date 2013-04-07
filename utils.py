@@ -13,10 +13,12 @@ class Session(object):
 
     def __getitem__(self, key):
         value = self.handler.get_secure_cookie(key)
+        logging.info('{}: {}'.format(key, value))
         value = json.loads(value)
         return value
 
     def __setitem__(self, key, value):
+        logging.info('{}: {}'.format(key, value))
         value = json.dumps(value)
         return self.handler.set_secure_cookie(key, value)
 

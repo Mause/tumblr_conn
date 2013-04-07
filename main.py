@@ -17,6 +17,7 @@
 
 # stdlib
 import os
+import sys
 import time
 import json
 import logging
@@ -37,6 +38,8 @@ from utils import reblog_path_source
 from auth_data import consumer_key, consumer_secret
 from utils import compute_radial_d3_points, compute_d3_points
 
+sys.argv.append('--logging=INFO')
+tornado.options.parse_command_line()
 
 # callback_url = 'http://tumblr-conn.appspot.com/callback'
 callback_url = 'http://tumblr-conn.herokuapp.com/callback'
