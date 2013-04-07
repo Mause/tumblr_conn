@@ -33,11 +33,11 @@ class TumblrOAuthClient(OAuth1):
                 "oauth_token": oauth_token,
                 "oauth_token_secret": oauth_token_secret})
         logging.info('Responce; %s' % resp.text)
-        # logging.info('Content; %s' % content)
+
         access_token = dict(urllib.parse.parse_qsl(resp.text))
         logging.info('access_token; %s' % access_token)
         if 'oauth_token' not in access_token:
-            raise Exception(str(access_token))
+            raise Exception(resp.text)
 
         return oauthlib.oauth2.draft25.tokens.BearerToken.create_token(
             access_token['oauth_token'],

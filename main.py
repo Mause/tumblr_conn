@@ -249,6 +249,13 @@ class AnalyseHandler(BaseHandler):
             self.redirect('/')
 
 
+class TestHandler(BaseHandler):
+    def get(self):
+        r = requests.get('http://requestb.in/nuqjrenu',
+            auth=tumblr_oauth)
+        self.write(r.text)
+
+
 settings = {
     'cookie_secret': 'key_kay_wooookoo',
     "static_path": os.path.join(os.path.dirname(__file__), "static"),
@@ -261,6 +268,7 @@ application = tornado.web.Application([
         tornado.web.StaticFileHandler, {'path': settings['static_path']}),
 
     (r'/', MainHandler),
+    (r'/test', TestHandler),
     (r'/callback', CallbackHandler),
     (r'/graph/force', ForceGraphHandler),
     (r'/graph/force/graph_data', ForceGraphDataHandler),
