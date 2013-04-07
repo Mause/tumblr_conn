@@ -29,7 +29,9 @@ class TumblrOAuthClient(OAuth1):
         # client = oauthlib.oauth1.Client(self.consumer, token)
 
         resp = requests.post(self.ACCESS_TOKEN_URL, auth=self,
-            params={'request_token': self.request_token})
+            params={
+                "oauth_token": self.session['oauth_token'],
+                "oauth_token_secret": self.session['oauth_token_secret']})
         logging.info('Responce; %s' % resp.text)
         # logging.info('Content; %s' % content)
         access_token = dict(urllib.parse.parse_qsl(resp.text))
