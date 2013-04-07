@@ -67,9 +67,9 @@ class MainHandler(BaseHandler):
             tumblr_oauth.get_authorize_url() + '&' +
             urllib.parse.urlencode({'oauth_callback': callback_url}))
 
-        if not self.session.get('authorized', False):
-            self.redirect(auth_url)
-            return
+        # if not self.session.get('authorized', False):
+        #     self.redirect(auth_url)
+        #     return
 
         access_key = self.session.get('access_key', None)
         access_secret = self.session.get('access_secret', None)
