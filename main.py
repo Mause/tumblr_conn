@@ -101,6 +101,8 @@ class CallbackHandler(BaseHandler):
     def get(self):
         self.session['authorized'] = True
         oauth_verifier = self.get_argument('oauth_verifier')
+        logging.info('oauth_verifier; {}'.format(oauth_verifier))
+
         access_token = tumblr_oauth.get_access_token(
             oauth_verifier,
             oauth_token=self.session['oauth_token'],
