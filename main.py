@@ -77,6 +77,11 @@ class MainHandler(BaseHandler):
             self.render('auth.html', auth_url=auth_url)
             self.set_secure_cookie('blog_name', self.get_argument('blog_name'))
 
+            logging.info('oauth_token; {}'.format(
+                tumblr_oauth.request_token['oauth_token']))
+            logging.info('oauth_token_secret; {}'.format(
+                tumblr_oauth.request_token['oauth_token_secret']))
+
             self.session['oauth_token'] = str(
                 tumblr_oauth.request_token['oauth_token'])
             self.session('oauth_token_secret', str(
