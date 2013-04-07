@@ -121,6 +121,7 @@ class CallbackHandler(BaseHandler):
         # This is the end of Step 3, we can now extract resource owner key & secret
         # as well as some extra information such as screen name.
         info = urllib.parse.parse_qs(r.content)
+        logging.info('info; {}'.format(info))
 
         # Save credentials in the session, it is VERY important that these are not
         # shown to the resource owner, Flask session cookies are encrypted so we are ok.
