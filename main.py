@@ -75,8 +75,8 @@ class MainHandler(BaseHandler):
         access_secret = self.get_secure_cookie('access_secret', None)
 
         if not access_secret or not access_key:
-            self.render('auth.html', auth_url=auth_url)
-            self.set_secure_cookie('blog_name', self.get_argument('blog_name'))
+            self.set_secure_cookie('blog_name',
+                self.get_argument('blog_name', None))
 
             logging.info('oauth_token; {}'.format(
                 tumblr_oauth.request_token['oauth_token']))
@@ -87,6 +87,8 @@ class MainHandler(BaseHandler):
                 tumblr_oauth.request_token['oauth_token'])
             self.session('oauth_token_secret', str(
                 tumblr_oauth.request_token['oauth_token_secret']))
+
+            self.render('auth.html', auth_url=auth_url)
         else:
             blog_name = self.request.get('blog_name')
             if not blog_name:
