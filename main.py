@@ -92,18 +92,19 @@ class MainHandler(BaseHandler):
 class CallbackHandler(BaseHandler):
     def get(self):
         self.session['authorized'] = True
-        oauth_verifier = self.request.get('oauth_verifier')
+        oauth_verifier = self.get_argument('oauth_verifier')
         access_token = tumblr_oauth.get_access_token(
             oauth_verifier,
-            oauth_token=str(self.session['oauth_token']),
-            oauth_token_secret=str(self.session['oauth_token_secret']))
+            oauth_token=self.session['oauth_token'],
+            oauth_token_secret=self.session['oauth_token_secret'])
         self.session['access_key'] = access_token.key
         self.session['access_secret'] = access_token.secret
-        # memcache.set('access_key', access_token.key)
-        # memcache.set('access_secret', access_token.secret)
-        redirect_url = '/' + (
-            '?blog_name=' +
-            self.session['blog_name'] if self.session['blog_name'] else '')
+
+        redirect_url = '/'
+        if self.session['blog_name']:
+            redirect_url += '?' + urllib.parse.urlencode({
+                'blog_name': self.session['blog_name']})
+
         self.redirect(redirect_url)
 
 
