@@ -1,4 +1,5 @@
 import time
+import json
 import logging
 from itertools import chain, groupby
 
@@ -11,9 +12,12 @@ class Session(object):
         self.handler = handler
 
     def __getitem__(self, key):
-        return self.handler.get_secure_cookie(key)
+        value = self.handler.get_secure_cookie(key)
+        value = json.loads(value)
+        return value
 
     def __setitem__(self, key, value):
+        value = json.dumps(value)
         return self.handler.set_secure_cookie(key, value)
 
 
