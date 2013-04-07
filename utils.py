@@ -7,14 +7,21 @@ import tornado.web
 
 
 class Session(object):
+    def __init__(self, handler):
+        self.handler = handler
+
     def __getitem__(self, key):
-        return self.get_secure_cookie(key)
+        return self.handler.get_secure_cookie(key)
 
     def __setitem__(self, key, value):
-        return self.set_secure_cookie(key, value)
+        return self.handler.set_secure_cookie(key, value)
 
 
 class BaseHandler(tornado.web.RequestHandler):
+    def __init__(self, *args, **kwargs):
+        self.session = Session(self)
+        return super(BaseHandler, self).__init__(*args, **kwargs)
+
     def render(self, filename, **template_values):
         """
         convenience function, performs monotonous operations
@@ -25,7 +32,6 @@ class BaseHandler(tornado.web.RequestHandler):
 
         super(BaseHandler, self).render(filename, **template_values)
 
-    session = Session()
 
     # def dispatch(self):
     #     # Get a session store for this request.
