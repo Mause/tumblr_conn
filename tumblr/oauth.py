@@ -1,17 +1,9 @@
-# import logging
-import urllib.parse
-import oauthlib.oauth1
-
 import logging
-# import code
-import requests
-# import oauth2 as oauth
+import urllib.parse
 
-# from oauthlib.oauth2.draft25 import parameters
-# from oauthlib.oauth2.draft25 import utils
-# from oauthlib import common
+import requests
+import oauthlib.oauth1
 from requests_oauthlib import OAuth1
-# look up tumblr's flow :P
 
 
 class TumblrOAuthClient(OAuth1):

@@ -19,11 +19,11 @@ class Session(dict):
 
     def __getitem__(self, key):
         value = self.handler.get_secure_cookie(key)
+        logging.info('{}: {}'.format(key, value))
         if not value:
             raise KeyError
         else:
             value = value.decode('utf-8')
-            logging.info('{}: {}'.format(key, value))
             value = json.loads(value)
             return value
 
