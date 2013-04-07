@@ -6,6 +6,14 @@ import requests
 import tornado.web
 
 
+class Session(object):
+    def __getitem__(self, key):
+        return self.get_secure_cookie(key)
+
+    def __setitem__(self, key, value):
+        return self.set_secure_cookie(key, value)
+
+
 class BaseHandler(tornado.web.RequestHandler):
     def render(self, filename, **template_values):
         """
@@ -16,6 +24,8 @@ class BaseHandler(tornado.web.RequestHandler):
             template_values["to_console"] = {}
 
         super(BaseHandler, self).render(filename, **template_values)
+
+    session = Session()
 
     # def dispatch(self):
     #     # Get a session store for this request.
