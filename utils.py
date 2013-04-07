@@ -22,6 +22,7 @@ class Session(dict):
         if not value:
             raise KeyError
         else:
+            value = value.decode('utf-8')
             logging.info('{}: {}'.format(key, value))
             value = json.loads(value)
             return value
