@@ -1,8 +1,7 @@
 import json
 import logging
-import oauth2
-import urllib
-import urlparse
+import oauthlib
+import urllib.parse
 
 
 class TumblrClient(object):
@@ -46,24 +45,24 @@ class TumblrClient(object):
         if 'hostname' not in format_params:
             format_params['hostname'] = self.hostname
         path = format_string % format_params
-        query_string = urllib.urlencode(query_params)
+        query_string = urllib.parse.urlencode(query_params)
 
-        parsed_url = urlparse.SplitResult(scheme=self.API_SCHEME,
+        parsed_url = urllib.parse.SplitResult(scheme=self.API_SCHEME,
             netloc=self.API_HOST, path=path, query=query_string,
             fragment=None)
 
-        request_url = urlparse.urlunsplit(parsed_url)
+        request_url = urllib.parse.urlunsplit(parsed_url)
 
         logging.debug('Built URL: %s ' % request_url)
 
         return request_url
 
     def make_unauthorized_request(self, request_url):
-        response = urllib.urlopen(request_url)
+        response = urllib.request.urlopen(request_url)
 
         try:
             json_response = json.load(response)
-        except ValueError, e:
+        except ValueError as e:
             logging.error('Invalid response: %s (%d)' % (e,
                 response.getcode()))
             return None
@@ -75,7 +74,7 @@ class TumblrClient(object):
             logging.error('Missing OAuth credentials')
             return None
 
-        oauth_client = oauth2.Client(self.consumer, self.token)
+        oauth_client = oauthlib.Client(self.consumer, self.token)
         if body:
             response, content = oauth_client.request(request_url, method,
                 body)
@@ -84,7 +83,7 @@ class TumblrClient(object):
 
         try:
             json_response = json.loads(content)
-        except ValueError, e:
+        except ValueError as e:
             logging.error('Invalid response: %s (%s)' % (e,
                 response['status']))
             return None
@@ -146,7 +145,7 @@ class TumblrClient(object):
         request_url = self.build_url(self.BLOG_URLS['post'])
 
         return self.make_oauth_request(request_url, method='POST',
-            body=urllib.urlencode(request_params))
+            body=urllib.parse.urlencode(request_params))
 
     def edit_post(self, post_id, request_params={}):
         request_url = self.build_url(self.BLOG_URLS['edit'])
@@ -155,7 +154,7 @@ class TumblrClient(object):
             request_params['id'] = post_id
 
         return self.make_oauth_request(request_url, method='POST',
-            body=urllib.urlencode(request_params))
+            body=urllib.parse.urlencode(request_params))
 
     def reblog_post(self, reblog_key, request_params={}):
         request_url = self.build_url(self.BLOG_URLS['edit'])
@@ -164,7 +163,7 @@ class TumblrClient(object):
             request_params['reblog_key'] = reblog_key
 
         return self.make_oauth_request(request_url, method='POST',
-            body=urllib.urlencode(request_params))
+            body=urllib.parse.urlencode(request_params))
 
     def delete_post(self, post_id):
         request_url = self.build_url(self.BLOG_URLS['delete'])
@@ -174,4 +173,4 @@ class TumblrClient(object):
         }
 
         return self.make_oauth_request(request_url, method='POST',
-            body=urllib.urlencode(request_params))
+            body=urllib.parse.urlencode(request_params))

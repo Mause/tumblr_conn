@@ -6,7 +6,7 @@ import requests
 
 class Logging:
     def info(self, message):
-        print message
+        print(message)
 logging = Logging()
 
 
@@ -27,7 +27,7 @@ def reblog_path_sink(hostname, post_id, client):
         'Just to confirm, we are starting at the user %s'
         ' and their post with id %s' % (hostname, post_id))
 
-    print 'Reloop'
+    print('Reloop')
 
     # root_hostname = hostname
     # root_post_id = post_id
@@ -46,18 +46,16 @@ def reblog_path_sink(hostname, post_id, client):
             logging.info('Could not reach remote server. Try try again')
 
     # lets filter out anything that is not a reblog
-    all_reblogs = filter(
-        lambda x: x['type'] == 'reblog',
-        cur_post['response']['posts'][0]['notes'])
+    all_reblogs = [x for x in cur_post['response']['posts'][0]['notes'] if x['type'] == 'reblog']
     with open('okay_go.json', 'w') as fh:
         fh.write(json.dumps(all_reblogs))
 
     for reblog in all_reblogs:
-        print reblog
+        print(reblog)
         if reblog['blog_name'] != hostname:
             tree[post_id][reblog['post_id']] = reblog_path_sink(
                 reblog['blog_name'], reblog['post_id'], client)
 
     return (tree, hostname, post_id)
 
-print reblog_path_sink(u'realitybitesus', u'35691493805', client)[1:]
+print(reblog_path_sink('realitybitesus', '35691493805', client)[1:])

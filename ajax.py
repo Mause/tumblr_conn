@@ -10,7 +10,8 @@ from main import default_status
 
 class MappingStatusHandler(BaseHandler):
     def get(self, blog_name):
-        cur_status = memcache.get(blog_name + '_mapping_status') or default_status.copy()
+        cur_status = memcache.get(
+            blog_name + '_mapping_status') or default_status.copy()
         if cur_status:
             logging.info('Position in post queue; %s' %
                 cur_status['cur_index'])

@@ -22,13 +22,13 @@
             Simple Connection Analyser
         </title>
         <!-- Included CSS Files (Compressed) -->
-        <link rel="stylesheet" href="stylesheets/foundation.min.css">
-        <link rel="stylesheet" href="stylesheets/app.css">
-        <link rel="stylesheet" href="stylesheets/custom.css">
-        <link rel="stylesheet" href="stylesheets/zurb.mega-drop.css">
-        <script src="javascripts/modernizr.foundation.js"></script>
+        <link rel="stylesheet" href="{{ static_url("stylesheets/foundation.min.css") }}">
+        <link rel="stylesheet" href="{{ static_url("stylesheets/app.css") }}">
+        <link rel="stylesheet" href="{{ static_url("stylesheets/custom.css") }}">
+        <link rel="stylesheet" href="{{ static_url("stylesheets/zurb.mega-drop.css") }}">
+        <script src="{{ static_url("javascripts/modernizr.foundation.js") }}"></script>
         <!-- Latest version of jQuery -->
-        <script src="javascripts/jquery.js"></script>
+        <script src="{{ static_url("javascripts/jquery.js") }}"></script>
         <!-- IE Fix for HTML5 Tags -->
         <!--[if lt IE 9]>
             <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js">
@@ -47,19 +47,19 @@
                 </div>
             </div>
             <div class="twelve column">
-                {% block "content" %}{% endblock %}
+                {% block "content" %}{% end %}
             </div>
         </div>
 
         <!-- Included JS Files (Minified) -->
-        <script src="javascripts/foundation.min.js"></script>
+        <script src="{{ static_url("javascripts/foundation.min.js") }}"></script>
 
         <!-- Initialize JS Plugins -->
-        <script src="javascripts/app.js"></script>
+        <script src="{{ static_url("javascripts/app.js") }}"></script>
         <!--
-        {% for key, value in to_console.items %}
+        {% for key, value in to_console.items() %}
         {{key}}; {{value}}
-        {%endfor%}
+        {%end%}
         -->
     </body>
 </html>

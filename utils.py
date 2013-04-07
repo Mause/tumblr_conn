@@ -1,32 +1,37 @@
-import os
-import json
 import time
-import webapp2
 import logging
-import google.appengine.runtime
-from webapp2_extras import sessions
 from itertools import chain, groupby
-from google.appengine.api import urlfetch
-from google.appengine.ext.webapp import template
-from google.appengine.api import urlfetch_errors
+
+import requests
+import tornado.web
 
 
-class BaseHandler(webapp2.RequestHandler):
-    def dispatch(self):
-        # Get a session store for this request.
-        self.session_store = sessions.get_store(request=self.request)
+class BaseHandler(tornado.web.RequestHandler):
+    def render(self, filename, **template_values):
+        """
+        convenience function, performs monotonous operations
+        required whenever a template needs to be rendered
+        """
+        if "to_console" not in list(template_values.keys()):
+            template_values["to_console"] = {}
 
-        try:
-            # Dispatch the request.
-            webapp2.RequestHandler.dispatch(self)
-        finally:
-            # Save all sessions.
-            self.session_store.save_sessions(self.response)
+        super(BaseHandler, self).render(filename, **template_values)
 
-    @webapp2.cached_property
-    def session(self):
-        # Returns a session using the default cookie key.
-        return self.session_store.get_session()
+    # def dispatch(self):
+    #     # Get a session store for this request.
+    #     self.session_store = sessions.get_store(request=self.request)
+
+    #     try:
+    #         # Dispatch the request.
+    #         webapp2.RequestHandler.dispatch(self)
+    #     finally:
+    #         # Save all sessions.
+    #         self.session_store.save_sessions(self.response)
+
+    # @webapp2.cached_property
+    # def session(self):
+    #     # Returns a session using the default cookie key.
+    #     return self.session_store.get_session()
 
 
 def reblog_path_source(hostname, post_id, client):
@@ -45,7 +50,8 @@ def reblog_path_source(hostname, post_id, client):
     dest = cur_post['response']['posts'][0]['reblogged_root_name']
 
     relations = []
-    logging.info('Tracing a post from "%s" with post id "%s"' % (hostname, post_id))
+    logging.info(
+        'Tracing a post from "%s" with post id "%s"' % (hostname, post_id))
 
     # loop until we arrive at our destination
     while dest != cur_post['response']['posts'][0]['blog_name']:
@@ -57,8 +63,7 @@ def reblog_path_source(hostname, post_id, client):
                     hostname=hostname,
                     key=client.get_api_key(),
                     id=post_id))
-        except (urlfetch.DownloadError, urlfetch_errors.DeadlineExceededError,
-                google.appengine.runtime.DeadlineExceededError, google.appengine.runtime.apiproxy_errors.DeadlineExceededError):
+        except requests.DownloadError:
             # if any errors occurred, ignore em and try try again
             logging.info('Try try again')
         else:
@@ -97,7 +102,9 @@ def reblog_path_sink(hostname, post_id, client):
                 id=post_id))
 
     tree = {}
-    logging.info('Just to confirm, we are starting at the user %s and their post with id %s' % (hostname, post_id))
+    logging.info(
+        'Just to confirm, we are starting at the user %s '
+        'and their post with id %s' % (hostname, post_id))
 
     while True:
         try:
@@ -108,8 +115,9 @@ def reblog_path_sink(hostname, post_id, client):
                     key=client.get_api_key(),
                     id=post_id))
 
-        except urlfetch.DownloadError:
-            logging.info('Try try again')  # ignore these errors, and try try again
+        except requests.DownloadError:
+            logging.info(
+                'Try try again')  # ignore these errors, and try try again
         else:
             try:
                 if ('reblogged_from_name' not in cur_post['response']['posts'][0] or
@@ -123,7 +131,8 @@ def reblog_path_sink(hostname, post_id, client):
             hostname = cur_post['response']['posts'][0]['reblogged_from_name']
             post_id = cur_post['response']['posts'][0]['reblogged_from_id']
 
-            tree[post_id].append([cur_post['response']['posts'][0]['blog_name'],
+            tree[post_id].append(
+                [cur_post['response']['posts'][0]['blog_name'],
                 cur_post['response']['posts'][0]['reblogged_from_name']])
 
             logging.info('%s reblogged from %s' % (
@@ -181,19 +190,6 @@ def compute_radial_d3_points(relations):
 
         logging.info('Posts; %s' % len(id_relations))
 
-        return id_relations.values()
+        return list(id_relations.values())
     else:
         return
-
-
-def render(handler, filename, template_values):
-    """
-    convenience function, performs monotonous operations required whenever a template needs to be rendered
-    """
-    if "to_console" not in template_values.keys():
-        template_values["to_console"] = {}
-    template_values['to_console']['version'] = os.environ['CURRENT_VERSION_ID']
-    # template_values["to_console"] = json.dumps(template_values["to_console"])
-    template_values["currentAddress"] = handler.request.host_url
-    path = os.path.join(os.path.dirname(__file__), 'templates/' + filename)
-    handler.response.out.write(template.render(path, template_values))

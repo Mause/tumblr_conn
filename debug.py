@@ -31,10 +31,12 @@ class ViewHandler(BaseHandler):
                     self.response.write('%s;</br>' % (item))
                     if tests[item]:
                         for sub in tests[item]:
-                            self.response.write('<div class="r">%s</div>' % (sub))
+                            self.response.write(
+                                '<div class="r">%s</div>' % (sub))
                         self.response.write('</br>')
                     else:
-                        self.response.write('<div class="r">Empty item</div></br>')
+                        self.response.write(
+                            '<div class="r">Empty item</div></br>')
             else:
                 self.response.write('No data yet')
         else:
@@ -54,7 +56,10 @@ class TestHandler(BaseHandler):
                 'access_key': access_key,
                 'access_secret': access_secret
                 })
-        self.response.write('Task for "%s" dispatched at %s. Check <a href="/ajax/%s/mapping/status">here</a> for current status' %
+        self.response.write(
+            'Task for "%s" dispatched at %s. '
+            'Check <a href="/ajax/%s/mapping/status">here</a> '
+            'for current status' %
             (blog_name, time.ctime(), blog_name))
         memcache.set(blog_name + '_mapping_status', default_status.copy())
 
