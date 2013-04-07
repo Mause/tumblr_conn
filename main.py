@@ -65,10 +65,32 @@ default_status = {
 
 class MainHandler(BaseHandler):
     def get(self):
-        auth_url = (
-            tumblr_oauth.get_authorize_url() + '&' +
-            urllib.parse.urlencode({'oauth_callback': callback_url}))
+        # auth_url = (
+        #     tumblr_oauth.get_authorize_url() + '&' +
+        #     urllib.parse.urlencode({'oauth_callback': callback_url}))
 
+        """ Step 1 of the authentication workflow, obtain a temporary
+        resource owner key and use it to redirect the user. The user
+        will authorize the client (our flask app) to access its resources
+        and perform actions in its name (aka get feed and post updates)."""
+
+        # In this step you will need to supply your twitter provided key and secret
+        tumblr = OAuth1(consumer_key,
+            client_secret=consumer_secret)
+
+        # We will be using the default method of supplying parameters, which is
+        # in the authorization header.
+        r = requests.post(tumblr_oauth.REQUEST_TOKEN_URL, auth=tumblr)
+
+        logging.info(r.text)
+        # Extract the temporary resource owner key from the response
+        token = urllib.parse.parse_qs(r.content)["oauth_token"][0]
+
+        # Create the redirection url and send the user to twitter
+        # This is the start of Step 2
+        auth_url = u"{url}?oauth_token={token}".format(
+            url=tumblr_oauth.AUTHORIZE_URL, token=token)
+        # return redirect(auth)
         # if not self.session.get('authorized', False):
         #     self.redirect(auth_url)
         #     return
@@ -97,6 +119,9 @@ class MainHandler(BaseHandler):
             else:
                 self.session['blog_name'] = blog_name
                 self.render('primary_view.html', blog_name=blog_name)
+
+
+
 
 
 class CallbackHandler(BaseHandler):
