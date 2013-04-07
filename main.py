@@ -38,7 +38,8 @@ from auth_data import consumer_key, consumer_secret
 from utils import compute_radial_d3_points, compute_d3_points
 
 
-callback_url = 'http://tumblr-conn.appspot.com/callback'
+# callback_url = 'http://tumblr-conn.appspot.com/callback'
+callback_url = 'http://tumblr-conn.herokuapp.com/callback'
 
 tumblr_oauth = TumblrOAuthClient(
     consumer_key,

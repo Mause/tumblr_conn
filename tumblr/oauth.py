@@ -21,11 +21,10 @@ class TumblrOAuthClient(OAuth1):
 
     def get_authorize_url(self):
         r = requests.post(url=self.REQUEST_TOKEN_URL, auth=self)
-        r.content
 
         self.request_token = dict(urllib.parse.parse_qsl(r.text))
-        return "%s?oauth_token=%s" % (self.AUTHORIZE_URL,
-            self.request_token['oauth_token'])
+        params = {"oauth_token": self.request_token['oauth_token']}
+        return self.AUTHORIZE_URL + "?" + urllib.parse.urlencode(params)
 
 
     # def get_authorize_url(self):
