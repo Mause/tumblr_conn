@@ -122,6 +122,9 @@ class CallbackHandler(BaseHandler):
         verifier = self.get_argument("oauth_verifier")
         token = self.get_argument("oauth_token")
 
+        logging.info('verifier; {}'.format(verifier))
+        logging.info('token; {}'.format(token))
+
         # In this step we also use the verifier
         tumblr = OAuth1(
             consumer_key,
@@ -134,7 +137,7 @@ class CallbackHandler(BaseHandler):
         # we can now extract resource owner key & secret
         # as well as some extra information such as screen name.
         info = urllib.parse.parse_qs(r.content)
-        logging.info('info; {}'.format(info))
+        # logging.info('info; {}'.format(info))
 
         assert 'oauth_token' in info, info
         assert 'oauth_token_secret' in info, info
