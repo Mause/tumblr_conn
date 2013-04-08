@@ -136,6 +136,9 @@ class CallbackHandler(BaseHandler):
         info = urllib.parse.parse_qs(r.content)
         logging.info('info; {}'.format(info))
 
+        assert 'oauth_token' in info, info
+        assert 'oauth_token_secret' in info, info
+
         # Save credentials in the session,
         # it is VERY important that these are not
         # shown to the resource owner,
@@ -149,28 +152,6 @@ class CallbackHandler(BaseHandler):
                 'blog_name': self.session['blog_name']})
 
         self.redirect(redirect_url)
-
-
-
-# class CallbackHandler(BaseHandler):
-#     def get(self):
-#         self.session['authorized'] = True
-#         oauth_verifier = self.get_argument('oauth_verifier')
-#         logging.info('oauth_verifier; {}'.format(oauth_verifier))
-
-#         access_token = tumblr_oauth.get_access_token(
-#             oauth_verifier,
-#             oauth_token=self.session['oauth_token'],
-#             oauth_token_secret=self.session['oauth_token_secret'])
-#         self.session['access_key'] = access_token.key
-#         self.session['access_secret'] = access_token.secret
-
-#         redirect_url = '/'
-#         if self.session['blog_name']:
-#             redirect_url += '?' + urllib.parse.urlencode({
-#                 'blog_name': self.session['blog_name']})
-
-#         self.redirect(redirect_url)
 
 
 class MappingWorker(tornado.web.RequestHandler):
