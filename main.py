@@ -65,52 +65,45 @@ default_status = {
 
 class MainHandler(BaseHandler):
     def get(self):
-        # auth_url = (
-        #     tumblr_oauth.get_authorize_url() + '&' +
-        #     urllib.parse.urlencode({'oauth_callback': callback_url}))
-
-        """ Step 1 of the authentication workflow, obtain a temporary
-        resource owner key and use it to redirect the user. The user
-        will authorize the client (our flask app) to access its resources
-        and perform actions in its name (aka get feed and post updates)."""
-
-        # In this step you will need to supply your twitter provided key and secret
-        tumblr = OAuth1(consumer_key,
-            client_secret=consumer_secret)
-
-        # We will be using the default method of supplying parameters, which is
-        # in the authorization header.
-        r = requests.post(tumblr_oauth.REQUEST_TOKEN_URL, auth=tumblr)
-
-        # Extract the temporary resource owner key from the response
-        info = urllib.parse.parse_qs(r.text)
-        logging.info(info)
-        token = info["oauth_token"][0]
-
-        # Create the redirection url and send the user to twitter
-        # This is the start of Step 2
-        auth_url = u"{url}?oauth_token={token}".format(
-            url=tumblr_oauth.AUTHORIZE_URL, token=token)
-        # return redirect(auth)
-        # if not self.session.get('authorized', False):
-        #     self.redirect(auth_url)
-        #     return
 
         access_key = self.session.get('access_key', None)
         access_secret = self.session.get('access_secret', None)
 
         if not access_secret or not access_key:
+            """ Step 1 of the authentication workflow, obtain a temporary
+            resource owner key and use it to redirect the user. The user
+            will authorize the client (our flask app) to access its resources
+            and perform actions in its name (aka get feed and post updates)."""
+
+            # In this step you will need to supply your twitter
+            # provided key and secret
+            tumblr = OAuth1(consumer_key,
+                client_secret=consumer_secret)
+
+            # We will be using the default method of
+            # supplying parameters, which is in the authorization header.
+            r = requests.post(tumblr_oauth.REQUEST_TOKEN_URL, auth=tumblr)
+
+            # Extract the temporary resource owner key from the response
+            info = urllib.parse.parse_qs(r.text)
+            logging.info(info)
+            oauth_token = info["oauth_token"][0]
+
+            # Create the redirection url and send the user to twitter
+            # This is the start of Step 2
+            auth_url = u"{url}?oauth_token={token}".format(
+                url=tumblr_oauth.AUTHORIZE_URL, token=oauth_token)
+
             self.session['blog_name'] = self.get_argument('blog_name', None)
 
-            logging.info('oauth_token; {}'.format(
-                tumblr_oauth.request_token['oauth_token']))
-            logging.info('oauth_token_secret; {}'.format(
-                tumblr_oauth.request_token['oauth_token_secret']))
+            logging.info('oauth_token; {}'.format(oauth_token))
+            # logging.info('oauth_token_secret; {}'.format(
+            #     tumblr_oauth.request_token['oauth_token_secret']))
 
-            self.session['oauth_token'] = str(
-                tumblr_oauth.request_token['oauth_token'])
-            self.session['oauth_token_secret'] = str(
-                tumblr_oauth.request_token['oauth_token_secret'])
+            # self.session['oauth_token'] = str(
+            #     tumblr_oauth.request_token['oauth_token'])
+            # self.session['oauth_token_secret'] = str(
+            #     tumblr_oauth.request_token['oauth_token_secret'])
 
             self.render('auth.html', auth_url=auth_url)
         else:
@@ -122,17 +115,8 @@ class MainHandler(BaseHandler):
                 self.render('primary_view.html', blog_name=blog_name)
 
 
-
-
-
 class CallbackHandler(BaseHandler):
     def get(self):
-        """ Step 2 & 3 of the workflow. The user has now been redirected back to the
-        callback URL you defined when you registered your client on twitter. This
-        marks the end of step 2. In step 3 we will obtain the resource owner credentials.
-        The callback url query will include 2 extra parameters that we need, the verifier
-        and token (which is the same temporary key that we obtained in step 1."""
-
         verifier = self.get_argument("oauth_verifier")
         token = self.get_argument("oauth_token")
 
@@ -144,13 +128,16 @@ class CallbackHandler(BaseHandler):
             verifier=verifier)
         r = requests.post(tumblr_oauth.ACCESS_TOKEN_URL, auth=tumblr)
 
-        # This is the end of Step 3, we can now extract resource owner key & secret
+        # This is the end of Step 3,
+        # we can now extract resource owner key & secret
         # as well as some extra information such as screen name.
         info = urllib.parse.parse_qs(r.content)
         logging.info('info; {}'.format(info))
 
-        # Save credentials in the session, it is VERY important that these are not
-        # shown to the resource owner, Flask session cookies are encrypted so we are ok.
+        # Save credentials in the session,
+        # it is VERY important that these are not
+        # shown to the resource owner,
+        # Flask session cookies are encrypted so we are ok.
         self.session["access_token"] = info["oauth_token"][0]
         self.session["token_secret"] = info["oauth_token_secret"][0]
 
