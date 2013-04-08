@@ -86,6 +86,8 @@ class MainHandler(BaseHandler):
 
             # Extract the temporary resource owner key from the response
             info = urllib.parse.parse_qs(r.text)
+            assert 'oauth_token' in info, info
+
             logging.info(info)
             oauth_token = info["oauth_token"][0]
 
