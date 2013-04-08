@@ -1,8 +1,8 @@
-import logging
-import urllib.parse
+# import logging
+# import urllib.parse
 
-import requests
-import oauthlib.oauth1
+# import requests
+# import oauthlib.oauth1
 from requests_oauthlib import OAuth1
 
 
@@ -12,36 +12,36 @@ class TumblrOAuthClient(OAuth1):
     ACCESS_TOKEN_URL = 'https://www.tumblr.com/oauth/access_token'
     XAUTH_ACCESS_TOKEN_URL = 'https://www.tumblr.com/oauth/access_token'
 
-    def get_authorize_url(self):
-        r = requests.post(url=self.REQUEST_TOKEN_URL, auth=self)
+    # def get_authorize_url(self):
+    #     r = requests.post(url=self.REQUEST_TOKEN_URL, auth=self)
 
-        self.request_token = dict(urllib.parse.parse_qsl(r.text))
-        params = {"oauth_token": self.request_token['oauth_token']}
-        return self.AUTHORIZE_URL + "?" + urllib.parse.urlencode(params)
+    #     self.request_token = dict(urllib.parse.parse_qsl(r.text))
+    #     params = {"oauth_token": self.request_token['oauth_token']}
+    #     return self.AUTHORIZE_URL + "?" + urllib.parse.urlencode(params)
 
-    def get_access_token(self, oauth_verifier, oauth_token=None,
-            oauth_token_secret=None):
-        # token = oauth.Token(
-        # token = oauthlib.oauth2.draft25.tokens.BearerToken.create_token(
-        #     oauth_token or self.request_token['oauth_token'],
-        #     oauth_token_secret or self.request_token['oauth_token_secret'])
-        # token.set_verifier(oauth_verifier)
-        # client = oauthlib.oauth1.Client(self.consumer, token)
+    # def get_access_token(self, oauth_verifier, oauth_token=None,
+    #         oauth_token_secret=None):
+    #     # token = oauth.Token(
+    #     # token = oauthlib.oauth2.draft25.tokens.BearerToken.create_token(
+    #     #     oauth_token or self.request_token['oauth_token'],
+    #     #     oauth_token_secret or self.request_token['oauth_token_secret'])
+    #     # token.set_verifier(oauth_verifier)
+    #     # client = oauthlib.oauth1.Client(self.consumer, token)
 
-        params = {"oauth_token": oauth_token,
-                "oauth_token_secret": oauth_token_secret}
-        resp = requests.post(self.ACCESS_TOKEN_URL, auth=self,
-            params=params)
-        logging.info('Responce; %s' % resp.text)
+    #     params = {"oauth_token": oauth_token,
+    #             "oauth_token_secret": oauth_token_secret}
+    #     resp = requests.post(self.ACCESS_TOKEN_URL, auth=self,
+    #         params=params)
+    #     logging.info('Responce; %s' % resp.text)
 
-        access_token = dict(urllib.parse.parse_qsl(resp.text))
-        logging.info('access_token; %s' % access_token)
-        if 'oauth_token' not in access_token:
-            raise Exception(resp.text)
+    #     access_token = dict(urllib.parse.parse_qsl(resp.text))
+    #     logging.info('access_token; %s' % access_token)
+    #     if 'oauth_token' not in access_token:
+    #         raise Exception(resp.text)
 
-        return oauthlib.oauth2.draft25.tokens.BearerToken.create_token(
-            access_token['oauth_token'],
-            access_token['oauth_token_secret'])
+    #     return oauthlib.oauth2.draft25.tokens.BearerToken.create_token(
+    #         access_token['oauth_token'],
+    #         access_token['oauth_token_secret'])
 
 
 
