@@ -82,9 +82,10 @@ class MainHandler(BaseHandler):
         # in the authorization header.
         r = requests.post(tumblr_oauth.REQUEST_TOKEN_URL, auth=tumblr)
 
-        logging.info(r.text)
         # Extract the temporary resource owner key from the response
-        token = urllib.parse.parse_qs(r.content)["oauth_token"][0]
+        info = urllib.parse.parse_qs(r.text)
+        logging.info(info)
+        token = info["oauth_token"][0]
 
         # Create the redirection url and send the user to twitter
         # This is the start of Step 2
