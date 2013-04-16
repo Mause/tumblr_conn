@@ -1,61 +1,69 @@
+# stdlib
 import json
-import os
-# from itertools import chain, groupby
+
+import logging
+from pprint import pprint
+
+# third party
 import requests
 
+logging.info = print
+logging.debug = print
 
-class Logging:
-    def info(self, message):
-        print(message)
-logging = Logging()
-
-
-class CLIENT:
-    def make_oauth_request(self, url):
-        return json.loads(requests.get(url).content)
-
-    def get_api_key(self):
-        return 'XCnTLihnMZpJoG0z2uBnqBFGqkv5OxDawCNTE56n0muP5IScfJ'
-client = CLIENT()
+import auth_data
+from utils import APIKeyAuth
+from utils import build_url
+from utils import expand_hostname
 
 
-def reblog_path_sink(hostname, post_id, client):
-    logging.info('This is going to be expensive. I hope you can afford it :P')
-    cur_post = None
-    tree = {}
-    logging.info(
-        'Just to confirm, we are starting at the user %s'
-        ' and their post with id %s' % (hostname, post_id))
+def get_reblogs(post_id, client, url_template):
+    selection_index = 0
 
-    print('Reloop')
+    r = requests.get(
+        url_template + str(post_id),
+        auth=client)
 
-    # root_hostname = hostname
-    # root_post_id = post_id
-    while not cur_post:
-        try:
-            cur_post = client.make_oauth_request(
-                'http://api.tumblr.com/v2/blog/{hostname}.tumblr.com'
-                '/posts?api_key={key}&id={id}&reblog_info=true&'
-                'notes_info=true'.format(
-                        hostname=hostname,
-                        key=client.get_api_key(),
-                        id=post_id))
-            with open('debug%sfirst.json' % os.sep, 'w') as fh:
-                fh.write(json.dumps(cur_post))
-        except requests.exceptions.ConnectionError:
-            logging.info('Could not reach remote server. Try try again')
+    assert r.ok, r.text
+    cur_post = r.json()
+    with open('debug/first.json', 'w') as fh:
+        json.dump(cur_post, fh)
 
     # lets filter out anything that is not a reblog
-    all_reblogs = [x for x in cur_post['response']['posts'][0]['notes'] if x['type'] == 'reblog']
+    all_reblogs = filter(lambda x: x['type'] == 'reblog',
+                         cur_post['response']['posts'][selection_index]['notes'])
+    all_reblogs = list(all_reblogs)
+    return all_reblogs
+
+
+def reblog_path_sink(hostname, post_id, client, depth=0, posts_seen=set()):
+    hostname = expand_hostname(hostname)
+    url_template = build_url(hostname) + 'posts?reblog_info=true&notes_info=true&id={}'
+
+    tree = {}
+    logging.info('user="{}" && id="{}" && depth="{}"'.format(hostname, post_id, depth))
+
+    all_reblogs = get_reblogs(
+        post_id,
+        client,
+        url_template)
+
     with open('okay_go.json', 'w') as fh:
         fh.write(json.dumps(all_reblogs))
 
     for reblog in all_reblogs:
-        print(reblog)
+        # print(reblog)
         if reblog['blog_name'] != hostname:
-            tree[post_id][reblog['post_id']] = reblog_path_sink(
-                reblog['blog_name'], reblog['post_id'], client)
+            if reblog['post_id'] not in posts_seen:
+                posts_seen.add(reblog['post_id'])
+                tree[reblog['post_id']] = reblog_path_sink(
+                    reblog['blog_name'], reblog['post_id'], client, depth + 1)
+            else:
+                pass
+                # print('abort, seen before')
 
     return (tree, hostname, post_id)
 
-print(reblog_path_sink('realitybitesus', '35691493805', client)[1:])
+client = APIKeyAuth(auth_data['api_key'])
+
+e_tree, _, _ = reblog_path_sink('dearestherquotes', '46848673358', client)
+pprint(e_tree)

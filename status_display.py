@@ -6,19 +6,16 @@ argv = sys.argv[1:]
 blog_name = argv[0] if len(argv) > 0 else 'mause-me'
 
 
-print(('Tracing the blog "%s"'.format(blog_name)))
-print()
+print('Tracing the blog "%s"\n'.format(blog_name))
 
 r = requests.get(
-        'http://tumblr-conn.appspot.com/ajax/%s/mapping/status'
-        % blog_name)
+    'http://tumblr-conn.appspot.com/ajax/%s/mapping/status' % blog_name)
 
 if r.json['queue'] == []:
     print('Post queue is empty.')
 
 if not r.json['running']:
-    print('Not running. Displaying statistics from last analysis.')
-    print()
+    print('Not running. Displaying statistics from last analysis.\n')
 
 
 if float(r.json['starttime']) != 0:
