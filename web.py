@@ -33,8 +33,8 @@ import debug
 from auth_data import api_key
 from utils.url import expand_hostname, build_url
 from utils.data_attainment import reblog_path_source
+from utils.graph_data import compute_d3_points, process_graph_data
 from utils import APIKeyAuth, BaseHandler, default_status, memcache
-from utils.graph_data import compute_radial_d3_points, compute_d3_points, process_graph_data
 
 sys.argv.append('--logging=INFO')
 tornado.options.parse_command_line()
@@ -49,6 +49,8 @@ class MainHandler(BaseHandler):
         if not blog_name:
             self.render('input_blog.html')
         else:
+            blog_name = expand_hostname(blog_name)
+            logging.info(blog_name)
             self.session['blog_name'] = blog_name
             self.render('primary_view.html', blog_name=blog_name)
 

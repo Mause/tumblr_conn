@@ -1,24 +1,28 @@
+# stdlib
 import json
 import urllib.parse
 from queue import Queue
 
+# thind party
 import tornado.web
 from requests.auth import AuthBase
 
 
 # this is more for debugging, to ensure it never gets changed
+# and yes i know it is bad practice, as it is non-pythonic
 class ConstantDict(dict):
-    def __init__(self, dictionary):
-        self.dictionary = dictionary
+    pass
+    # def __init__(self, dictionary):
+    #     self.dictionary = dictionary
 
-    def __getitem__(self, key):
-        return self.dictionary.__getitem__(key)
+    # def __getitem__(self, key):
+    #     return self.dictionary.__getitem__(key)
 
-    def __repr__(self):
-        return self.dictionary.__repr__()
+    # def __repr__(self):
+    #     return self.dictionary.__repr__()
 
-    def __setitem__(self, key, value):
-        raise TypeError('Dictionary is constant')
+    # def __setitem__(self, key, value):
+    #     raise TypeError('Dictionary is constant')
 
 default_status = ConstantDict({
     'queue': [],
