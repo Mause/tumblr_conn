@@ -31,18 +31,10 @@ import tornado.options
 import ajax
 import debug
 from auth_data import api_key
-from utils import (
-    compute_radial_d3_points,
-    compute_d3_points,
-    expand_hostname,
-    build_url,
-    APIKeyAuth,
-    BaseHandler,
-    default_status,
-    reblog_path_source,
-    memcache,
-    process_graph_data
-)
+from utils.url import expand_hostname, build_url
+from utils.data_attainment import reblog_path_source
+from utils import APIKeyAuth, BaseHandler, default_status, memcache
+from utils.graph_data import compute_radial_d3_points, compute_d3_points, process_graph_data
 
 sys.argv.append('--logging=INFO')
 tornado.options.parse_command_line()
@@ -139,14 +131,8 @@ class ForceGraphHandler(BaseHandler):
 
 class ForceGraphDataHandler(BaseHandler):
     def get(self):
-        self.response.write(process_graph_data(
-            self, processing_function=compute_d3_points))
-
-
-class BundleGraphDataHandler(BaseHandler):
-    def get(self):
-        self.response.write(process_graph_data(
-            self, processing_function=compute_radial_d3_points))
+        self.write(
+            process_graph_data(self, processing_function=compute_d3_points))
 
 
 class AnalyseHandler(BaseHandler):
