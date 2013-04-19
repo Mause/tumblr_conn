@@ -50,9 +50,11 @@ var initialise_graph = function(filename){
         });
     });
 };
+var filename = getURLParameter('filename');
 if (!filename) {
     console.error('The filename variable must be a scope accessable to the initialise_graph function call');
     initialise_graph('http://localhost:8888/static/example.json');
 } else {
+    filename = '/graph/force/graph_data?blog_name=' + toString(filename);
     initialise_graph(filename);
 }
