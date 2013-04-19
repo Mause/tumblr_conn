@@ -1,2 +1,3 @@
-import sys
-sys.exit(0)
+import time
+while True:
+    time.sleep(5)
