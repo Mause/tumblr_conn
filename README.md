@@ -21,16 +21,17 @@ when i say follow to source, what i mean is this;
  * reblogger
  | \
  |  * another reblogger
- .  |\
- .  | * yet another
- .  .  \
+ |  |\
+ |  | \
+ |  |  * yet another
  .  .   \
- .  .    * blog from which we start
+ .  .    \
+ .  .     * blog from which we start
 ```
-we are following from the blog specified, so the source; following the reblog trail
+We are following from the blog specified, so the source; following the reblog trail.
 
-when i say following to the sink, i mean we are travelling in the opposite direction; from the source out.
-this is obviously a far more expensive operation, as some posts may have thousands and thousands of people having reblogged them
+When i say following to the sink, i mean we are traveling in the opposite direction; from the source out.
+This is obviously a far more expensive operation, as some posts may have thousands and thousands of blogs having reblogged them.
 
 
 ### License
@@ -41,7 +42,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
