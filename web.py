@@ -99,7 +99,6 @@ class MappingWorker(tornado.web.RequestHandler):
             for cur_index, post in enumerate(con):
                 returned_data = reblog_path_source(
                     post['blog_name'], post['id'], tumblr_auth)
-                # logging.info(returned_data)
 
                 if returned_data:
                     source[post['id']], hostname, post_id = returned_data
