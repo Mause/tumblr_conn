@@ -19,14 +19,12 @@ when i say follow to source, what i mean is this;
  * source
  |
  * reblogger
- | \
- |  * another reblogger
- |  |\
- |  | \
- |  |  * yet another
- .  .   \
- .  .    \
- .  .     * blog from which we start
+ |
+ * another reblogger
+ |
+ * yet another
+ |
+ * blog from which we start
 ```
 We are following from the blog specified, so the source; following the reblog trail.
 
