@@ -46,8 +46,7 @@ def expand_hostname(hostname):
 
 def build_url(hostname):
     hostname = expand_hostname(hostname)
-    return 'http://api.tumblr.com/v2/blog/{hostname}.tumblr.com/'.format(
-        hostname)
+    return 'http://api.tumblr.com/v2/blog/{}.tumblr.com/'.format(hostname)
 
 
 def main():

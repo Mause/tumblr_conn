@@ -38,8 +38,8 @@ default_status = ConstantDict({
 class Memcache(dict):
     cache = {}
 
-    def get(self, key):
-        return super(Memcache, self).get(key)
+    def get(self, key, default=None):
+        return super(Memcache, self).get(key, default)
 
     def set(self, key, value):
         self[key] = value

@@ -34,20 +34,26 @@ def reblog_path_source(hostname, post_id, auth):
     cur_post = requests.get(url,
                             auth=auth,
                             params={
-                                "reblog_info": True,
+                                "notes_info": "true",
+                                "reblog_info": "true",
                                 "id": post_id
                             })
+    logging.debug(cur_post.url)
+    if not cur_post.ok:
+        raise Exception('Not OK; {}'.format(cur_post))
+    else:
+        cur_post = cur_post.json()
 
+    logging.info(cur_post)
     # if this post is original to this blog
     if 'reblogged_root_name' not in cur_post['response']['posts'][0]:
-        return (None, None, None)
+        return None
 
     # record destination in log book ;)
     dest = cur_post['response']['posts'][0]['reblogged_root_name']
 
     relations = []
-    logging.info(
-        'Tracing a post from "%s" with post id "%s"' % (hostname, post_id))
+    logging.info('Tracing a post from "{}" with post id "{}"'.format(hostname, post_id))
 
     # loop until we arrive at our destination
     while dest != cur_post['response']['posts'][0]['blog_name']:

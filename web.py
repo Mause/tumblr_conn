@@ -20,7 +20,6 @@ import os
 import sys
 import time
 import logging
-import http.client
 
 # third party
 import tornado
@@ -36,7 +35,7 @@ from utils.data_attainment import reblog_path_source
 from utils.graph_data import compute_d3_points, process_graph_data
 from utils import APIKeyAuth, BaseHandler, default_status, memcache
 
-sys.argv.append('--logging=INFO')
+sys.argv.append('--logging=DEBUG')
 tornado.options.parse_command_line()
 
 callback_url = 'http://tumblr-conn.herokuapp.com/callback'
@@ -56,55 +55,58 @@ class MainHandler(BaseHandler):
 
 
 class MappingWorker(tornado.web.RequestHandler):
-    def post(self):
-        root_blog_name = self.get_argument('blog_name')
-        logging.info('Going to analyse "%s"' % (root_blog_name))
-        hostname = expand_hostname(root_blog_name)
-        url = build_url(hostname)
+    def get(self):
+        return self.work()
 
-        cur_status = memcache.get(root_blog_name + '_mapping_status')
+    def post(self):
+        return self.work()
+
+    def work(self):
+        if self:
+            root_blog_name = self.get_argument('blog_name')
+        else:
+            logging.info('Debugging init')
+            root_blog_name = 'normal.blog.mause.me'
+        hostname = expand_hostname(root_blog_name)
+        logging.info('Going to analyse "%s"' % (hostname))
+        url = build_url(hostname) + 'posts'
+
+        cur_status = memcache.get(hostname + '_mapping_status', None)
         if not cur_status:
             cur_status = default_status.copy()
-            cur_status['starttime'] = time.time()
-            cur_status['running'] = True
-        memcache.set(root_blog_name + '_mapping_status', cur_status)
+            cur_status.update({
+                'starttime': time.time(),
+                'running': True
+            })
+        memcache.set(hostname + '_mapping_status', cur_status)
 
         params = {'reblog_info': 'true', 'notes_info': 'true'}
-        con = []
-        json_response = None
-
-        while not json_response:
-            try:
-                json_response = requests.get(url, auth=tumblr_auth,
-                                             params=params)
-            except http.client.HTTPException as e:
-                logging.info(str(e))
+        json_response = requests.get(url,
+                                     auth=tumblr_auth,
+                                     params=params)
 
         logging.info(json_response)
-        con += json_response['response']['posts']
+        con = json_response.json()['response']['posts']
+
+        logging.info('Reblogged? {}'.format('reblogged_from_id' in con[0]))
 
         logging.info('This many posts; %s' % len(con))
         cur_status['queue'] = con
-        memcache.set(root_blog_name + '_mapping_status', cur_status)
+        memcache.set(hostname + '_mapping_status', cur_status)
 
         if con:
             source = {}
             for cur_index, post in enumerate(con):
                 returned_data = reblog_path_source(
                     post['blog_name'], post['id'], tumblr_auth)
-                if list(filter(bool, returned_data)):
+                # logging.info(returned_data)
+
+                if returned_data:
                     source[post['id']], hostname, post_id = returned_data
-                    memcache.set(root_blog_name + '_source', source)
-                    logging.info(
-                        'The original poster was %s and the post id was %s' % (
-                            hostname, post_id))
-                    logging.info(
-                        'Set the returned data to the "{}_source" key'.format(
-                            root_blog_name))
+                    memcache.set(hostname + '_source', source)
+                    logging.info('The original poster was {} and the post id was {}'.format(hostname, post_id))
                 else:
-                    logging.info(
-                        'Incomplete data was returned. '
-                        'Ignoring, was likely an original post')
+                    logging.info('incomplete data; likely an original post')
 
                 # these lines are commented while i work on the
                 # path sink function
@@ -113,15 +115,17 @@ class MappingWorker(tornado.web.RequestHandler):
                 # memcache.set('sink', sink)
 
                 cur_status['cur_index'] = cur_index + 1
-                memcache.set(root_blog_name + '_mapping_status', cur_status)
+                memcache.set(hostname + '_mapping_status', cur_status)
         else:
-            logging.info('get_blog_posts return None')
+            logging.info('failed to fetch blog posts')
             cur_status['failed'] = True
 
-        cur_status['endtime'] = time.time()
-        cur_status['running'] = False
-        cur_status['queue'] = []
-        memcache.set(root_blog_name + '_mapping_status', cur_status)
+        cur_status.update({
+            'endtime': time.time(),
+            'running': False,
+            'queue': []
+        })
+        memcache.set(hostname + '_mapping_status', cur_status)
         logging.info('And i am done here')
 
 
