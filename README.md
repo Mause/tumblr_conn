@@ -1,5 +1,13 @@
 Simple Tumblr Blog Connection Analyzer
 ======================================
+
+## Please note, this is currently not functional.
+Lots of changes and having to re-implement some stuff from;
+ * Google App Engine -> Heroku
+ * Python 2.7 -> Python 3.3
+ * webapp -> tornado
+
+
 Current implementation follows reblog trails from current user back to source.
 Hopefully, I will get the `reblog_path_sink` function in `test_sink.py` working sometime in the future.
 
@@ -10,6 +18,7 @@ As stated in requirements.txt;
  * requests==1.1.0
  * tornado==2.4.1
  * pyzmq==13.0.2
+Though whether or not the final implementation will use pyzmq is... debatable.
 
 ## Implementation details
 
@@ -32,7 +41,7 @@ When I say following to the sink, I mean we are traveling in the opposite direct
 This is obviously a far more expensive operation, as some posts may have thousands and thousands of blogs having reblogged them.
 
 
-### License
+## License
 
 Copyright 2012 Dominic May
 
