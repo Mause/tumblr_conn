@@ -91,7 +91,8 @@ class MappingWorker(tornado.web.RequestHandler):
         logging.info('Reblogged? {}'.format('reblogged_from_id' in con[0]))
 
         logging.info('This many posts; %s' % len(con))
-        cur_status['queue'] = con
+        # cur_status['queue'] = con
+        cur_status['queue_len'] = len(con)
         memcache.set(hostname + '_mapping_status', cur_status)
 
         if con:
@@ -122,7 +123,8 @@ class MappingWorker(tornado.web.RequestHandler):
         cur_status.update({
             'endtime': time.time(),
             'running': False,
-            'queue': []
+            # 'queue': []
+            'queue_len': 0
         })
         memcache.set(hostname + '_mapping_status', cur_status)
         logging.info('And i am done here')

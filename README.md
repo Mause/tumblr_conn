@@ -1,7 +1,7 @@
 Simple Tumblr Blog Connection Analyzer
 ======================================
 Current implementation follows reblog trails from current user back to source.
-Hopefully, i will get the `reblog_path_sink` function in `test_sink.py` working sometime in the future.
+Hopefully, I will get the `reblog_path_sink` function in `test_sink.py` working sometime in the future.
 
 Originally built for Google App Engine, on the Python 2.7 platform.
 Currently working towards having it run properly on Heroku, python-3.3.0.
@@ -13,7 +13,7 @@ As stated in requirements.txt;
 
 ## Implementation details
 
-when i say follow to source, what i mean is this;
+Using this as reference;
 
 ```
  * source
@@ -26,9 +26,9 @@ when i say follow to source, what i mean is this;
  |
  * blog from which we start
 ```
-We are following from the blog specified, so the source; following the reblog trail.
+When I say follow to the source, I mean we are following from the blog specified, to the source; following the reblog trail.
 
-When i say following to the sink, i mean we are traveling in the opposite direction; from the source out.
+When I say following to the sink, I mean we are traveling in the opposite direction; from the source out.
 This is obviously a far more expensive operation, as some posts may have thousands and thousands of blogs having reblogged them.
 
 

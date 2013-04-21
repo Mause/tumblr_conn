@@ -7,31 +7,15 @@ from queue import Queue
 import tornado.web
 from requests.auth import AuthBase
 
-
-# this is more for debugging, to ensure it never gets changed
-# and yes i know it is bad practice, as it is non-pythonic
-class ConstantDict(dict):
-    pass
-    # def __init__(self, dictionary):
-    #     self.dictionary = dictionary
-
-    # def __getitem__(self, key):
-    #     return self.dictionary.__getitem__(key)
-
-    # def __repr__(self):
-    #     return self.dictionary.__repr__()
-
-    # def __setitem__(self, key, value):
-    #     raise TypeError('Dictionary is constant')
-
-default_status = ConstantDict({
+default_status = {
     'queue': [],
+    'queue_len': 0,
     'cur_index': 0,
     'running': False,
     'starttime': 0,
     'endtime': 0,
     'failed': False
-})
+}
 
 
 # mockers
