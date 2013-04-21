@@ -2,7 +2,7 @@ Simple Tumblr Blog Connection Analyzer
 ======================================
 
 ## Please note, this is currently not functional.
-Lots of changes and having to re-implement some stuff from;
+Lots of changes and having to re-implement whilst moving stuff from;
  * Google App Engine -> Heroku
  * Python 2.7 -> Python 3.3
  * webapp -> tornado
@@ -18,6 +18,7 @@ As stated in requirements.txt;
  * requests==1.1.0
  * tornado==2.4.1
  * pyzmq==13.0.2
+
 Though whether or not the final implementation will use pyzmq is... debatable.
 
 ## Implementation details
