@@ -1,12 +1,13 @@
 Simple Tumblr Blog Connection Analyzer
 ======================================
-
-## Please note, this is currently not functional.
-Lots of changes and having to re-implement whilst moving stuff from;
+## Prologue
+### Please note, this is currently not functional.
+Lots of changes and having to re-implement functionality whilst moving stuff from;
  * Google App Engine -> Heroku
  * Python 2.7 -> Python 3.3
  * webapp -> tornado
 
+## Intro
 
 Current implementation follows reblog trails from current user back to source.
 Hopefully, I will get the `reblog_path_sink` function in `test_sink.py` working sometime in the future.
