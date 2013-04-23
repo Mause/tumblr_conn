@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 
-import json
 import logging
 
 from utils import BaseHandler, default_status, memcache
@@ -31,4 +30,4 @@ class MappingStatusHandler(BaseHandler):
 
         self.set_header('Content-Type', 'application/json')
         self.set_header('Access-Control-Allow-Origin', '*')
-        self.write(json.dumps(cur_status, indent=4))
+        self.write(cur_status)

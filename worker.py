@@ -17,7 +17,6 @@
 
 # stdlib
 import time
-import queue
 import logging
 import threading
 
@@ -55,6 +54,7 @@ def process_blog(root_blog_name):
                                  auth=tumblr_auth,
                                  params=params)
 
+    logging.info(json_response.url)
     logging.info(json_response)
     con = json_response.json()['response']['posts']
 
@@ -67,7 +67,10 @@ def process_blog(root_blog_name):
 
     if con:
         source = {}
-        for cur_index, post in enumerate(con):
+        cur_index = 0
+        post = con[0]
+        if True:
+        # for cur_index, post in enumerate(con):
             logging.info('fetching {} from {}'.format(post['id'], post['blog_name']))
             returned_data = reblog_path_source(
                 post['blog_name'], post['id'], tumblr_auth)
@@ -103,15 +106,17 @@ def process_blog(root_blog_name):
 
 def worker(taskqueue, shutdown_event):
     while True and not shutdown_event.is_set():
-        try:
-            task = taskqueue.get(timeout=1)
-        except queue.Empty:
-            pass
-            # if shutdown_event.is_set():
-            #     break
-        else:
+        task = taskqueue.get()
+        if shutdown_event.is_set():
+            break
+        elif not task.empty():
+            print('new task! {}'.format(task))
+            task.delete()
             process_blog(task['blog_name'])
-            task.task_done()
+
+            # may implement task done later
+            # task.task_done()
+        time.sleep(0.5)
 
 
 def main():
@@ -125,8 +130,6 @@ def main():
         all_workers.append(t)
 
     try:
-        n = input('New blog? ')
-        taskqueue.put({'blog_name': n})
         while True:
             pass
     finally:

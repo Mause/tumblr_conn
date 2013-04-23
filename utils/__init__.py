@@ -18,9 +18,9 @@
 # stdlib
 import json
 import urllib.parse
-from queue import Queue
 
 # thind party
+import iron_mq
 import tornado.web
 from requests.auth import AuthBase
 
@@ -50,20 +50,43 @@ class Memcache(dict):
 memcache = Memcache()
 
 
-class Taskqueue(Queue):
-    # in the final implementation, this will be network based
-    # so that both the web dyno's and the worker dyno's can access it
+class Taskqueue(object):
+    # IronMQ wrapper
+    def __init__(self, queue_obj):
+        self.queue_obj = queue_obj
 
-    # This may be one of a few things;
-    # * custom postgres based implementation
-    # * redis queue
-    # * zmq queue (actually, no)
-    # * IronMQ
+    class Message(object):
+        def __init__(self, queue_obj, message):
+            self.queue_obj = queue_obj
+            self.messages = message['messages']
 
-    # this will probably end up being a wrapper
-    pass
+            for i, m in enumerate(self.messages):
+                try:
+                    self.messages[i]['body'] = json.loads(m['body'])
+                except (TypeError, ValueError):
+                    pass
 
-taskqueue = Taskqueue()
+        def empty(self):
+            return not self.messages
+
+        def __getitem__(self, name):
+            return self.messages[0]['body'].__getitem__(name)
+
+        def delete(self):
+            m_iq = self.messages[0]['id']
+            return self.queue_obj.delete(m_iq)
+
+        def __repr__(self):
+            return '<Message {}>'.format(
+                self.messages[0]['body']
+                if not self.empty() else {})
+
+    def get(self, *args, **kwargs):
+        message = self.queue_obj.get(*args, **kwargs)
+        return self.Message(self.queue_obj, message)
+
+i = iron_mq.IronMQ()
+taskqueue = Taskqueue(i.queue('blogs'))
 
 
 class Session(dict):

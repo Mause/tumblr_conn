@@ -22,8 +22,14 @@ def process_graph_data(handler, processing_function):
 
         if all_data:
             # yay for (memory efficient) generators \o/
+
+            # ensure we are dealing with data!
             all_data = filter(bool, all_data)
+
+            # flatten that data!
             all_data = chain.from_iterable(all_data)
+
+            # ensure we are dealing with non-duplicated data!
             all_data = set(all_data)
 
             output_json = processing_function(all_data)
