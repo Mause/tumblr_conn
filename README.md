@@ -21,6 +21,7 @@ As stated in requirements.txt;
  * pyzmq==13.0.2
 
 Though whether or not the final implementation will use pyzmq is... debatable.
+As it stands, pyzqm is not used at all.
 
 ## Implementation details
 

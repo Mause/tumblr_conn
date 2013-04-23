@@ -29,7 +29,6 @@ def get_reblogs(post_id, client, url_template):
 
 
 def reblog_path_source(hostname, post_id, auth):
-
     url = build_url(hostname) + 'posts'
     cur_post = requests.get(url,
                             auth=auth,

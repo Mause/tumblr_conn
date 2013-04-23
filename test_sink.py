@@ -9,7 +9,7 @@ logging.info = print
 logging.debug = print
 
 import auth_data
-from utils import APIKeyAuth
+from utils import ParamAuth
 from utils.url import build_url, expand_hostname
 from utils.data_attainment import get_reblogs
 
@@ -42,7 +42,7 @@ def reblog_path_sink(hostname, post_id, client, depth=0, posts_seen=set()):
 
     return (tree, hostname, post_id)
 
-client = APIKeyAuth(auth_data['api_key'])
+client = ParamAuth(auth_data.api_key)
 
 e_tree, _, _ = reblog_path_sink('dearestherquotes', '46848673358', client)
 pprint(e_tree)

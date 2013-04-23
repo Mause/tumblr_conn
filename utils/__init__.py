@@ -20,8 +20,10 @@ default_status = {
 
 # mockers
 class Memcache(dict):
-    cache = {}
-
+    # this will also be networked in the final implementation
+    # * Memcached
+    # * redis
+    # * IronCache
     def get(self, key, default=None):
         return super(Memcache, self).get(key, default)
 
@@ -31,11 +33,18 @@ class Memcache(dict):
 memcache = Memcache()
 
 
-class Taskqueue(object):
-    my_queue = Queue()
+class Taskqueue(Queue):
+    # in the final implementation, this will be network based
+    # so that both the web dyno's and the worker dyno's can access it
 
-    def add(self, **kwargs):
-        self.my_queue.put(kwargs)
+    # This may be one of a few things;
+    # * custom postgres based implementation
+    # * redis queue
+    # * zmq queue (actually, no)
+    # * IronMQ
+
+    # this will probably end up being a wrapper
+    pass
 
 taskqueue = Taskqueue()
 
@@ -52,7 +61,7 @@ class Session(dict):
 
     def __getitem__(self, key):
         value = self.handler.get_secure_cookie(key)
-        # logging.info('{}: {}'.format(key, value))
+
         if not value:
             raise KeyError
         else:
@@ -65,19 +74,19 @@ class Session(dict):
         return self.handler.set_secure_cookie(key, value)
 
     def __iter__(self):
-        for item in self.request.cookies.keys():
+        for item in self.handler.request.cookies.keys():
             yield item
 
 
 # misc
-class APIKeyAuth(AuthBase):
+class ParamAuth(AuthBase):
     """Adds API key to the given Request object's url."""
-    def __init__(self, api_key):
-        self.api_key = api_key
+    def __init__(self, params):
+        self.params = params
 
     def __call__(self, r):
         # modify and return the request
-        extra = urllib.parse.urlencode({'api_key': self.api_key})
+        extra = urllib.parse.urlencode(self.params)
         url = r.url.split('?')
         if len(url) > 1:
             first, second = url
@@ -102,3 +111,10 @@ class BaseHandler(tornado.web.RequestHandler):
             template_values["to_console"] = {}
 
         super(BaseHandler, self).render(filename, **template_values)
+
+
+def main():
+    print(issubclass(Session, dict))
+
+if __name__ == '__main__':
+    main()
