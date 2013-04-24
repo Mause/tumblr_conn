@@ -49,40 +49,28 @@ def get_reblogs(post_id, client, url_template):
     return all_reblogs
 
 
-def reblog_path_source(hostname, post_id, auth):
-    url = build_url(hostname) + 'posts'
-    cur_post = requests.get(url,
-                            auth=auth,
-                            params={
-                                # "notes_info": "true",
-                                "reblog_info": "true",
-                                "id": post_id,
-                                "limit": 1
-                            })
-    logging.debug(cur_post.url)
-    if not cur_post.ok:
-        raise Exception('Not OK; {}'.format(cur_post))
-    else:
-        cur_post = cur_post.json()
+def reblog_path_source(from_post, auth):
+    # pprint(from_post)
+    hostname = from_post['blog_name']
+    post_id = from_post['id']
 
-    logging.info(cur_post)
+    url = build_url(hostname) + 'posts'
+
     pprint({
         k: v
-        for k, v in cur_post['response']['posts'][0].items()
+        for k, v in from_post.items()
         if k.startswith('reblog')})
 
     # if this post is original to this blog
-    if 'reblogged_root_name' not in cur_post['response']['posts'][0]:
+    if 'reblogged_root_name' not in from_post:
         return None
-
-    # record destination in log book ;)
-    dest = cur_post['response']['posts'][0]['reblogged_root_name']
 
     relations = []
     logging.info('Tracing a post from "{}" with post id "{}"'.format(hostname, post_id))
 
     # loop until we arrive at our destination
-    while dest != cur_post['response']['posts'][0]['blog_name']:
+    # while dest != cur_post['response']['posts'][0]['blog_name']:
+    while True:
         try:
             # request the selected post
             cur_post = requests.get(url, auth=auth, params={"id": post_id})

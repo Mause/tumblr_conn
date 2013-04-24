@@ -39,6 +39,7 @@ def process_blog(root_blog_name):
     hostname = expand_hostname(root_blog_name)
     logging.info('Going to analyse "%s"' % (hostname))
     url = build_url(hostname) + 'posts'
+    logging.info('URL; {}'.format(url))
 
     cur_status = memcache.get(hostname + '_mapping_status', None)
     if not cur_status:
@@ -50,7 +51,6 @@ def process_blog(root_blog_name):
     memcache.set(hostname + '_mapping_status', cur_status)
 
     params = {'reblog_info': 'true', 'limit': 1}
-    # , 'notes_info': 'true'}
     json_response = requests.get(url,
                                  auth=tumblr_auth,
                                  params=params)
@@ -71,10 +71,11 @@ def process_blog(root_blog_name):
         cur_index = 0
         post = con[0]
         if True:
+
         # for cur_index, post in enumerate(con):
-            logging.info('fetching {} from {}'.format(post['id'], post['blog_name']))
-            returned_data = reblog_path_source(
-                post['blog_name'], post['id'], tumblr_auth)
+            logging.info('fetching {} from {}, with sights set for {}'.format(
+                post['id'], post['blog_name'], post['reblogged_root_name']))
+            returned_data = reblog_path_source(from_post=post, auth=tumblr_auth)
 
             if returned_data:
                 source[post['id']], hostname, post_id = returned_data
@@ -130,6 +131,7 @@ def main():
         t.start()
         all_workers.append(t)
 
+    logging.info('Workers initialised')
     try:
         while True:
             pass
