@@ -21,6 +21,8 @@ import urllib.parse
 
 # thind party
 import iron_mq
+import iron_cache
+
 import tornado.web
 from requests.auth import AuthBase
 
@@ -36,18 +38,16 @@ default_status = {
 
 
 # mockers
-class Memcache(dict):
-    # this will also be networked in the final implementation
-    # * Memcached
-    # * redis
-    # * IronCache
-    def get(self, key, default=None):
-        return super(Memcache, self).get(key, default)
+class MemcacheContainer(object):
+    caches = {}
 
-    def set(self, key, value):
-        self[key] = value
+    def __getitem__(self, cache_name):
+        if cache_name not in self.caches:
+            self.caches[cache_name] = iron_cache.IronCache(cache_name)
+        return self.caches[cache_name]
 
-memcache = Memcache()
+
+memcache = MemcacheContainer()
 
 
 class Message(object):
@@ -59,6 +59,7 @@ class Message(object):
             try:
                 self.messages[i]['body'] = json.loads(m['body'])
             except (TypeError, ValueError):
+                # if it aint
                 pass
 
     def empty(self):
