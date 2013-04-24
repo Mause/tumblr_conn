@@ -16,12 +16,16 @@
 #
 
 "tumblr data accessing and processing"
+# stdlib
 import time
 import json
 import logging
+from pprint import pprint
 
+# third party
 import requests
 
+# application specific
 from .url import build_url
 
 
@@ -50,9 +54,10 @@ def reblog_path_source(hostname, post_id, auth):
     cur_post = requests.get(url,
                             auth=auth,
                             params={
-                                "notes_info": "true",
+                                # "notes_info": "true",
                                 "reblog_info": "true",
-                                "id": post_id
+                                "id": post_id,
+                                "limit": 1
                             })
     logging.debug(cur_post.url)
     if not cur_post.ok:
@@ -60,11 +65,11 @@ def reblog_path_source(hostname, post_id, auth):
     else:
         cur_post = cur_post.json()
 
-    # logging.info(cur_post)
-    try:
-        print(cur_post)
-    except UnicodeEncodeError:
-        print(repr(cur_post))
+    logging.info(cur_post)
+    pprint({
+        k: v
+        for k, v in cur_post['response']['posts'][0].items()
+        if k.startswith('reblog')})
 
     # if this post is original to this blog
     if 'reblogged_root_name' not in cur_post['response']['posts'][0]:

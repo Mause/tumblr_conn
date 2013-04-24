@@ -49,7 +49,8 @@ def process_blog(root_blog_name):
         })
     memcache.set(hostname + '_mapping_status', cur_status)
 
-    params = {'reblog_info': 'true', 'notes_info': 'true'}
+    params = {'reblog_info': 'true', 'limit': 1}
+    # , 'notes_info': 'true'}
     json_response = requests.get(url,
                                  auth=tumblr_auth,
                                  params=params)
