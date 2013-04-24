@@ -1,0 +1,12 @@
+language: python
+python:
+  - 2.7
+install:
+    - pip install tox
+script:
+    - tox
+branches:
+  only:
+    - master
+notifications:
+  irc: "irc.freenode.org#oauthlib"

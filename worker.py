@@ -35,7 +35,7 @@ logging.debug = print
 tumblr_auth = ParamAuth({'api_key': api_key})
 
 
-def process_blog(root_blog_name):
+def process_blog(root_blog_name, num_to_analyse):
     hostname = expand_hostname(root_blog_name)
     logging.info('Going to analyse "%s"' % (hostname))
     url = build_url(hostname) + 'posts'
@@ -50,7 +50,7 @@ def process_blog(root_blog_name):
         })
     memcache.set(hostname + '_mapping_status', cur_status)
 
-    params = {'reblog_info': 'true', 'limit': 1}
+    params = {'reblog_info': 'true', 'limit': num_to_analyse}
     json_response = requests.get(url,
                                  auth=tumblr_auth,
                                  params=params)
@@ -59,22 +59,21 @@ def process_blog(root_blog_name):
     logging.info(json_response)
     con = json_response.json()['response']['posts']
 
-    logging.info('Reblogged? {}'.format('reblogged_from_id' in con[0]))
-
     logging.info('This many posts; %s' % len(con))
-    # cur_status['queue'] = con
+
     cur_status['queue_len'] = len(con)
     memcache.set(hostname + '_mapping_status', cur_status)
 
     if con:
         source = {}
-        cur_index = 0
-        post = con[0]
-        if True:
 
-        # for cur_index, post in enumerate(con):
+        for cur_index, post in enumerate(con):
+            if 'reblogged_root_name' not in post:
+                logging.info('Not reblogged')
+                continue
+
             logging.info('fetching {} from {}, with sights set for {}'.format(
-                post['id'], post['blog_name'], post['reblogged_root_name']))
+                post['id'], post['blog_name'], post['reblogged_root_name'] if 'reblogged_root_name' in post else '...'))
             returned_data = reblog_path_source(from_post=post, auth=tumblr_auth)
 
             if returned_data:
@@ -106,7 +105,7 @@ def process_blog(root_blog_name):
     logging.info('And i am done here')
 
 
-def worker(taskqueue, shutdown_event):
+def worker(taskqueue, shutdown_event, num_to_analyse):
     while True and not shutdown_event.is_set():
         task = taskqueue.get()
         if shutdown_event.is_set():
@@ -114,7 +113,7 @@ def worker(taskqueue, shutdown_event):
         elif not task.empty():
             print('new task! {}'.format(task))
             task.delete()
-            process_blog(task['blog_name'])
+            process_blog(task['blog_name'], num_to_analyse)
 
             # may implement task done later
             # task.task_done()
@@ -125,9 +124,10 @@ def main():
     shutdown_event = threading.Event()
     all_workers = []
     num_worker_threads = 4
+    num_to_analyse = 10
 
     for i in range(num_worker_threads):
-        t = threading.Thread(target=worker, args=(taskqueue, shutdown_event))
+        t = threading.Thread(target=worker, args=(taskqueue, shutdown_event, num_to_analyse))
         t.start()
         all_workers.append(t)
 

@@ -18,37 +18,127 @@
 # stdlib
 import os
 import sys
+import urllib
 import logging
 
 # third party
 import tornado
+import requests
 import tornado.options
+from requests_oauthlib import OAuth1
+from tumblr.oauth import TumblrOAuthClient
 
 # application specific
 import ajax
 import debug
-from auth_data import api_key
+from utils import BaseHandler
 from utils.url import expand_hostname
-from utils import ParamAuth, BaseHandler
+from auth_data import consumer_key, consumer_secret
 from utils.graph_data import compute_d3_points, process_graph_data
 
 sys.argv.append('--logging=DEBUG')
 tornado.options.parse_command_line()
 
 callback_url = 'http://tumblr-conn.herokuapp.com/callback'
-tumblr_auth = ParamAuth({'api_key': api_key})
+# tumblr_auth = ParamAuth({'api_key': api_key})
+tumblr_auth = TumblrOAuthClient(
+    consumer_key,
+    client_secret=consumer_secret)
 
 
 class MainHandler(BaseHandler):
     def get(self):
-        blog_name = self.get_argument('blog_name', None)
-        if not blog_name:
-            self.render('input_blog.html')
+
+        access_key = self.session.get('access_key', None)
+        access_secret = self.session.get('access_secret', None)
+
+        if not access_secret or not access_key:
+            """ Step 1 of the authentication workflow, obtain a temporary
+            resource owner key and use it to redirect the user. The user
+            will authorize the client (our flask app) to access its resources
+            and perform actions in its name (aka get feed and post updates)."""
+
+            # In this step you will need to supply your twitter
+            # provided key and secret
+            tumblr = OAuth1(consumer_key,
+                            client_secret=consumer_secret)
+
+            # We will be using the default method of
+            # supplying parameters, which is in the authorization header.
+            r = requests.post(tumblr_auth.REQUEST_TOKEN_URL, auth=tumblr)
+
+            # Extract the temporary resource owner key from the response
+            info = urllib.parse.parse_qs(r.text)
+            assert 'oauth_token' in info, info
+
+            logging.info(info)
+            oauth_token = info["oauth_token"][0]
+
+            # Create the redirection url and send the user to twitter
+            # This is the start of Step 2
+            auth_url = "{url}?oauth_token={token}".format(
+                url=tumblr_auth.AUTHORIZE_URL, token=oauth_token)
+
+            self.session['blog_name'] = self.get_argument('blog_name', None)
+
+            logging.info('oauth_token; {}'.format(oauth_token))
+            # logging.info('oauth_token_secret; {}'.format(
+            #     tumblr_auth.request_token['oauth_token_secret']))
+
+            # self.session['oauth_token'] = str(
+            #     tumblr_auth.request_token['oauth_token'])
+            # self.session['oauth_token_secret'] = str(
+            #     tumblr_auth.request_token['oauth_token_secret'])
+
+            self.render('auth.html', auth_url=auth_url)
         else:
-            blog_name = expand_hostname(blog_name)
-            logging.info(blog_name)
-            self.session['blog_name'] = blog_name
-            self.render('primary_view.html', blog_name=blog_name)
+            blog_name = self.get_argument('blog_name', None)
+            if not blog_name:
+                self.render('input_blog.html')
+            else:
+                blog_name = expand_hostname(blog_name)
+                logging.info(blog_name)
+                self.session['blog_name'] = blog_name
+                self.render('primary_view.html', blog_name=blog_name)
+
+
+class CallbackHandler(BaseHandler):
+    def get(self):
+        verifier = self.get_argument("oauth_verifier")
+        token = self.get_argument("oauth_token")
+
+        logging.info('verifier; {}'.format(verifier))
+        logging.info('token; {}'.format(token))
+
+        # In this step we also use the verifier
+        tumblr = OAuth1(
+            consumer_key,
+            client_secret=consumer_secret,
+            resource_owner_key=token,
+            verifier=verifier)
+        r = requests.post(tumblr_auth.ACCESS_TOKEN_URL, auth=tumblr)
+
+        # This is the end of Step 3,
+        # we can now extract resource owner key & secret
+        # as well as some extra information such as screen name.
+        info = urllib.parse.parse_qs(r.content)
+
+        assert 'oauth_token' in info, info
+        assert 'oauth_token_secret' in info, info
+
+        # Save credentials in the session,
+        # it is VERY important that these are not
+        # shown to the resource owner,
+        # Flask session cookies are encrypted so we are ok.
+        self.session["access_token"] = info["oauth_token"][0]
+        self.session["token_secret"] = info["oauth_token_secret"][0]
+
+        redirect_url = '/'
+        if self.session['blog_name']:
+            redirect_url += '?' + urllib.parse.urlencode({
+                'blog_name': self.session['blog_name']})
+
+        self.redirect(redirect_url)
 
 
 class ForceGraphHandler(BaseHandler):
@@ -85,6 +175,7 @@ application = tornado.web.Application([
         tornado.web.StaticFileHandler, {'path': settings['static_path']}),
 
     (r'/', MainHandler),
+    (r'/callback', CallbackHandler),
 
     (r'/graph/force', ForceGraphHandler),
     (r'/graph/force/graph_data', ForceGraphDataHandler),
