@@ -74,7 +74,7 @@ class MainHandler(BaseHandler):
 
             # Create the redirection url and send the user to twitter
             # This is the start of Step 2
-            auth_url = tumblr_auth.AUTHORIZE_URL + urllib.parse.urlencode({"oauth_token": oauth_token})
+            auth_url = tumblr_auth.AUTHORIZE_URL + '?' + urllib.parse.urlencode({"oauth_token": oauth_token})
 
             self.session['blog_name'] = self.get_argument('blog_name', None)
 
