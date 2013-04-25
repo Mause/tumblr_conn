@@ -39,8 +39,6 @@ from utils.graph_data import compute_d3_points, process_graph_data
 sys.argv.append('--logging=DEBUG')
 tornado.options.parse_command_line()
 
-callback_url = 'http://tumblr-conn.herokuapp.com/callback'
-
 tumblr_auth = TumblrOAuthClient(
     consumer_key,
     client_secret=consumer_secret)
@@ -76,8 +74,7 @@ class MainHandler(BaseHandler):
 
             # Create the redirection url and send the user to twitter
             # This is the start of Step 2
-            auth_url = "{url}?oauth_token={token}".format(
-                url=tumblr_auth.AUTHORIZE_URL, token=oauth_token)
+            auth_url = tumblr_auth.AUTHORIZE_URL + urllib.parse.urlencode({"oauth_token": oauth_token})
 
             self.session['blog_name'] = self.get_argument('blog_name', None)
 
@@ -104,8 +101,10 @@ class MainHandler(BaseHandler):
 class CallbackHandler(BaseHandler):
     def get(self):
         verifier = self.get_argument("oauth_verifier")
-        token = self.get_argument("oauth_token")
-        # token = self.session["oauth_token"]
+        # token = self.get_argument("oauth_token")
+
+        # TODO; check if the next line resolves our problem
+        token = self.session["oauth_token"]
 
         logging.info('verifier; {}'.format(verifier))
         logging.info('token; {}'.format(token))
@@ -144,7 +143,7 @@ class CallbackHandler(BaseHandler):
 class ForceGraphHandler(BaseHandler):
     def get(self):
         blog_name = self.get_argument('blog_name')
-        self.render('force_graph.html', **{'blog_name': blog_name})
+        self.render('force_graph.html', blog_name=blog_name)
 
 
 class ForceGraphDataHandler(BaseHandler):
@@ -158,7 +157,7 @@ class AnalyseHandler(BaseHandler):
         if self.session['blog_name']:
             self.render(
                 'analyse.html',
-                {'blog_name': self.session['blog_name']})
+                blog_name=self.session['blog_name'])
         else:
             self.redirect('/')
 
