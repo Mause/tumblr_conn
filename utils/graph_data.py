@@ -11,8 +11,8 @@ def process_graph_data(handler, processing_function):
 
     if blog_name:
         sink, source = [], []
-        sink = memcache.get(blog_name + '_sink') or {}
-        source = memcache.get(blog_name + '_source') or {}
+        sink = memcache['sinks'].get(blog_name) or {}
+        source = memcache['sources'].get(blog_name) or {}
 
         # looks messy, but just combines the dicts into one big dict
         # and grabs the values

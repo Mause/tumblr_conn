@@ -20,9 +20,8 @@ class ViewHandler(BaseHandler):
 
         self.write('<h2>%s</h2>' % blog_name)
         if blog_name:
-            test_key = '{}_source'.format(blog_name)
             self.write('<style>.r {margin-left: 40px;}</style>')
-            tests = memcache.get(test_key)
+            tests = memcache['sources'].get(blog_name)
             if tests:
                 for item in tests:
                     self.write('%s;</br>' % (item))
@@ -54,7 +53,7 @@ class TestHandler(BaseHandler):
             'Check <a href="/ajax/%s/mapping/status">here</a> '
             'for current status' %
             (blog_name, time.ctime(), blog_name))
-        memcache.set(blog_name + '_mapping_status', default_status.copy())
+        memcache['mapping_status'].set(blog_name, default_status.copy())
 
 
 class DebugHandler(BaseHandler):

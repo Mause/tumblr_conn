@@ -41,14 +41,14 @@ def process_blog(root_blog_name, num_to_analyse):
     url = build_url(hostname) + 'posts'
     logging.info('URL; {}'.format(url))
 
-    cur_status = memcache.get(hostname + '_mapping_status', None)
+    cur_status = memcache['mapping_status'].get(hostname, None)
     if not cur_status:
         cur_status = default_status.copy()
         cur_status.update({
             'starttime': time.time(),
             'running': True
         })
-    memcache.set(hostname + '_mapping_status', cur_status)
+    memcache['mapping_status'].set(hostname, cur_status)
 
     params = {'reblog_info': 'true', 'limit': num_to_analyse}
     json_response = requests.get(url,
@@ -62,7 +62,7 @@ def process_blog(root_blog_name, num_to_analyse):
     logging.info('This many posts; %s' % len(con))
 
     cur_status['queue_len'] = len(con)
-    memcache.set(hostname + '_mapping_status', cur_status)
+    memcache['mapping_status'].set(hostname, cur_status)
 
     if con:
         source = {}
@@ -78,7 +78,7 @@ def process_blog(root_blog_name, num_to_analyse):
 
             if returned_data:
                 source[post['id']], hostname, post_id = returned_data
-                memcache.set(hostname + '_source', source)
+                memcache['sources'].set(hostname, source)
                 logging.info('The original poster was {} and the post id was {}'.format(hostname, post_id))
             else:
                 logging.info('incomplete data; likely an original post')
@@ -87,10 +87,10 @@ def process_blog(root_blog_name, num_to_analyse):
             # path sink function
             # sink = []
             # sink = reblog_path_sink(hostname, post_id, client)
-            # memcache.set('sink', sink)
+            # memcache['sinks'].set(blog_name, sink)
 
             cur_status['cur_index'] = cur_index + 1
-            memcache.set(hostname + '_mapping_status', cur_status)
+            memcache['mapping_status'].set(hostname, cur_status)
     else:
         logging.info('failed to fetch blog posts')
         cur_status['failed'] = True
@@ -101,7 +101,7 @@ def process_blog(root_blog_name, num_to_analyse):
         # 'queue': []
         'queue_len': 0
     })
-    memcache.set(hostname + '_mapping_status', cur_status)
+    memcache['mapping_status'].set(hostname, cur_status)
     logging.info('And i am done here')
 
 
