@@ -107,7 +107,7 @@ def process_blog(root_blog_name, num_to_analyse):
 
 def worker(taskqueue, shutdown_event, num_to_analyse):
     while True and not shutdown_event.is_set():
-        task = taskqueue.get()
+        task = taskqueue['blog-post-mapper'].get()
         if shutdown_event.is_set():
             break
         elif not task.empty():

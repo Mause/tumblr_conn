@@ -35,7 +35,7 @@ class TumblrClient(object):
         return self.consumer.key
 
     def build_api_key_url(self, format_string, format_params={},
-        query_params={}):
+                          query_params={}):
         """Builds a URL and adds the client's API key"""
         if 'api_key' not in query_params:
             query_params['api_key'] = self.get_api_key()
@@ -47,7 +47,8 @@ class TumblrClient(object):
         path = format_string % format_params
         query_string = urllib.parse.urlencode(query_params)
 
-        parsed_url = urllib.parse.SplitResult(scheme=self.API_SCHEME,
+        parsed_url = urllib.parse.SplitResult(
+            scheme=self.API_SCHEME,
             netloc=self.API_HOST, path=path, query=query_string,
             fragment=None)
 
@@ -63,8 +64,8 @@ class TumblrClient(object):
         try:
             json_response = json.load(response)
         except ValueError as e:
-            logging.error('Invalid response: %s (%d)' % (e,
-                response.getcode()))
+            logging.error(
+                'Invalid response: %s (%d)' % (e, response.getcode()))
             return None
 
         return json_response
@@ -77,15 +78,14 @@ class TumblrClient(object):
         oauth_client = oauthlib.Client(self.consumer, self.token)
         if body:
             response, content = oauth_client.request(request_url, method,
-                body)
+                                                     body)
         else:
             response, content = oauth_client.request(request_url, method)
 
         try:
             json_response = json.loads(content)
         except ValueError as e:
-            logging.error('Invalid response: %s (%s)' % (e,
-                response['status']))
+            logging.error('Invalid response: %s (%s)' % (e, response['status']))
             return None
 
         return json_response
@@ -99,11 +99,11 @@ class TumblrClient(object):
             format_params = {
                 'type': post_type,
             }
-            request_url = self.build_api_key_url(self.BLOG_URLS['posts/type'],
-                format_params=format_params, query_params=request_params)
+            request_url = self.build_api_key_url(
+                self.BLOG_URLS['posts/type'], format_params=format_params, query_params=request_params)
         else:
-            request_url = self.build_api_key_url(self.BLOG_URLS['posts'],
-                query_params=request_params)
+            request_url = self.build_api_key_url(
+                self.BLOG_URLS['posts'], query_params=request_params)
 
         return self.make_unauthorized_request(request_url)
 
@@ -112,40 +112,40 @@ class TumblrClient(object):
             format_params = {
                 'size': size,
             }
-            return self.build_url(self.BLOG_URLS['avatar/size'],
-                format_params=format_params)
+            return self.build_url(
+                self.BLOG_URLS['avatar/size'], format_params=format_params)
         else:
             return self.build_url(self.BLOG_URLS['avatar'])
 
     def get_blog_followers(self, request_params={}):
-        request_url = self.build_api_key_url(self.BLOG_URLS['followers'],
-            query_params=request_params)
+        request_url = self.build_api_key_url(
+            self.BLOG_URLS['followers'], query_params=request_params)
 
         return self.make_oauth_request(request_url)
 
     def get_blog_queue(self, request_params={}):
-        request_url = self.build_api_key_url(self.BLOG_URLS['queue'],
-            query_params=request_params)
+        request_url = self.build_api_key_url(
+            self.BLOG_URLS['queue'], query_params=request_params)
 
         return self.make_oauth_request(request_url)
 
     def get_blog_drafts(self, request_params={}):
-        request_url = self.build_api_key_url(self.BLOG_URLS['draft'],
-            query_params=request_params)
+        request_url = self.build_api_key_url(
+            self.BLOG_URLS['draft'], query_params=request_params)
 
         return self.make_oauth_request(request_url)
 
     def get_blog_submissions(self, request_params={}):
-        request_url = self.build_api_key_url(self.BLOG_URLS['submission'],
-            query_params=request_params)
+        request_url = self.build_api_key_url(
+            self.BLOG_URLS['submission'], query_params=request_params)
 
         return self.make_oauth_request(request_url)
 
     def create_post(self, request_params={}):
         request_url = self.build_url(self.BLOG_URLS['post'])
 
-        return self.make_oauth_request(request_url, method='POST',
-            body=urllib.parse.urlencode(request_params))
+        return self.make_oauth_request(
+            request_url, method='POST', body=urllib.parse.urlencode(request_params))
 
     def edit_post(self, post_id, request_params={}):
         request_url = self.build_url(self.BLOG_URLS['edit'])
@@ -153,8 +153,8 @@ class TumblrClient(object):
         if 'id' not in request_params:
             request_params['id'] = post_id
 
-        return self.make_oauth_request(request_url, method='POST',
-            body=urllib.parse.urlencode(request_params))
+        return self.make_oauth_request(
+            request_url, method='POST', body=urllib.parse.urlencode(request_params))
 
     def reblog_post(self, reblog_key, request_params={}):
         request_url = self.build_url(self.BLOG_URLS['edit'])
@@ -162,8 +162,8 @@ class TumblrClient(object):
         if 'reblog_key' not in request_params:
             request_params['reblog_key'] = reblog_key
 
-        return self.make_oauth_request(request_url, method='POST',
-            body=urllib.parse.urlencode(request_params))
+        return self.make_oauth_request(
+            request_url, method='POST', body=urllib.parse.urlencode(request_params))
 
     def delete_post(self, post_id):
         request_url = self.build_url(self.BLOG_URLS['delete'])
@@ -172,5 +172,5 @@ class TumblrClient(object):
             'id': post_id,
         }
 
-        return self.make_oauth_request(request_url, method='POST',
-            body=urllib.parse.urlencode(request_params))
+        return self.make_oauth_request(
+            request_url, method='POST', body=urllib.parse.urlencode(request_params))

@@ -17,7 +17,8 @@
 
 import logging
 
-from utils import BaseHandler, default_status, memcache
+from utils.iron_wrap import memcache
+from utils import BaseHandler, default_status
 
 
 class MappingStatusHandler(BaseHandler):

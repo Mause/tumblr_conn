@@ -20,9 +20,6 @@ import json
 import urllib.parse
 
 # thind party
-import iron_mq
-import iron_cache
-
 import tornado.web
 from requests.auth import AuthBase
 
@@ -35,76 +32,6 @@ default_status = {
     'endtime': 0,
     'failed': False
 }
-
-
-# mockers
-class MemcacheContainer(object):
-    caches = {}
-
-    def __getitem__(self, cache_name):
-        if cache_name not in self.caches:
-            self.caches[cache_name] = iron_cache.IronCache(cache_name)
-        return self.caches[cache_name]
-
-
-memcache = MemcacheContainer()
-
-
-class Message(object):
-    def __init__(self, queue_obj, message):
-        self.queue_obj = queue_obj
-        self.messages = message['messages']
-
-        for i, m in enumerate(self.messages):
-            try:
-                self.messages[i]['body'] = json.loads(m['body'])
-            except (TypeError, ValueError):
-                # if it aint
-                pass
-
-    def empty(self):
-        return not self.messages
-
-    def __getitem__(self, name):
-        assert type(self.messages) == list
-        assert type(self.messages[0]) == dict
-        assert type(self.messages[0]['body']) == dict, self.messages[0]
-
-        return self.messages[0]['body'].__getitem__(name)
-
-    def delete(self):
-        m_id = self.messages[0]['id']
-        return self.queue_obj.delete(m_id)
-
-    def __repr__(self):
-        return '<Message {}>'.format(
-            self.messages[0]['body']
-            if not self.empty() else {})
-
-
-class Taskqueue(object):
-    # IronMQ wrapper
-    def __init__(self, iron_mq, queues):
-        self.iron_mq = iron_mq
-        self.queues = {
-            name: iron_mq.queue(name)
-            for name in queues}
-        self.default = 'blogs'
-
-    def get(self, queue_name=None):
-        selected_queue = queue_name or self.default
-
-        message = self.queues[selected_queue].get()
-        return Message(self.queues[selected_queue], message)
-
-    def add(self, params, url=None, queue_name=None):
-        # this is just a wrapper. in this implementation, we always ignore the url
-        selected_queue = queue_name or self.default
-
-        params = json.dumps(params)
-        return self.queues[selected_queue].post(params)
-
-taskqueue = Taskqueue(iron_mq.IronMQ(), ['blogs'])
 
 
 class Session(dict):

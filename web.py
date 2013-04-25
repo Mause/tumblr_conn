@@ -40,7 +40,7 @@ sys.argv.append('--logging=DEBUG')
 tornado.options.parse_command_line()
 
 callback_url = 'http://tumblr-conn.herokuapp.com/callback'
-# tumblr_auth = ParamAuth({'api_key': api_key})
+
 tumblr_auth = TumblrOAuthClient(
     consumer_key,
     client_secret=consumer_secret)
@@ -187,10 +187,11 @@ application = tornado.web.Application([
     (r'/db/test', debug.TestHandler),
     (r'/db/view', debug.ViewHandler),
     (r'/db/(?P<key>[^/]*)', debug.MainHandler),
-    (r'/db[/]?', debug.DebugHandler),
+    (r'/db/?', debug.DebugHandler),
 ], **settings)
 
 
 if __name__ == "__main__":
-    application.listen(os.environ.get('PORT', 8888))
+    port = os.environ.get('PORT', 8888)
+    application.listen(port)
     tornado.ioloop.IOLoop.instance().start()

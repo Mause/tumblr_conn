@@ -1,22 +1,35 @@
+#!/usr/bin/env python
+#
+# Copyright 2012 Dominic May
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 import time
 import logging
 
-from utils import (
-    memcache,
-    taskqueue,
-    BaseHandler,
-    default_status
-)
+from utils import BaseHandler, default_status
+from utils.iron_wrap import memcache, taskqueue
 
 
 class MainHandler(BaseHandler):
     def get(self, key):
-        self.write('%s; %s' % (key, self.session[key]))
+        self.write('{}; {}'.format(key, self.session[key]))
 
 
 class ViewHandler(BaseHandler):
     def get(self):
-        blog_name = self.get_argument('blog_name')
+        blog_name = self.get_argument('blog_name', None)
 
         self.write('<h2>%s</h2>' % blog_name)
         if blog_name:
@@ -27,12 +40,10 @@ class ViewHandler(BaseHandler):
                     self.write('%s;</br>' % (item))
                     if tests[item]:
                         for sub in tests[item]:
-                            self.write(
-                                '<div class="r">%s</div>' % (sub))
+                            self.write('<div class="r">{}</div>'.format(sub))
                         self.write('</br>')
                     else:
-                        self.write(
-                            '<div class="r">Empty item</div></br>')
+                        self.write('<div class="r">Empty item</div></br>')
             else:
                 self.write('No data yet')
         else:
@@ -44,10 +55,7 @@ class TestHandler(BaseHandler):
         blog_name = self.session.get('blog_name', None)
         if not blog_name:
             logging.info('Empty blog name')
-        taskqueue.add(
-            queue_name='blog-post-mapper',
-            url='/map_blog_post',
-            params={'blog_name': blog_name})
+        taskqueue['blog-post-mapper'].add({'blog_name': blog_name})
         self.write(
             'Task for "%s" dispatched at %s. '
             'Check <a href="/ajax/%s/mapping/status">here</a> '
