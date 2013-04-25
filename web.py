@@ -101,10 +101,10 @@ class MainHandler(BaseHandler):
 class CallbackHandler(BaseHandler):
     def get(self):
         verifier = self.get_argument("oauth_verifier")
-        # token = self.get_argument("oauth_token")
+        token = self.get_argument("oauth_token")
 
         # TODO; check if the next line resolves our problem
-        token = self.session["oauth_token"]
+        # token = self.session["oauth_token"]
 
         logging.info('verifier; {}'.format(verifier))
         logging.info('token; {}'.format(token))
@@ -122,8 +122,8 @@ class CallbackHandler(BaseHandler):
         # as well as some extra information such as screen name.
         info = urllib.parse.parse_qs(r.content)
 
-        assert 'oauth_token' in info, info
-        assert 'oauth_token_secret' in info, info
+        assert 'oauth_token' in info, r.text
+        assert 'oauth_token_secret' in info, r.text
 
         # Save credentials in the session,
         # it is VERY important that these are not

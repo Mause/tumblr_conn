@@ -46,11 +46,10 @@ class Session(dict):
             return default
 
     def __getitem__(self, key):
-        value = self.handler.get_secure_cookie(key)
-
-        if not value:
+        if key not in self.handler.request.cookies:
             raise KeyError('"{}" not in session'.format(key))
         else:
+            value = self.handler.get_secure_cookie(key)
             value = value.decode('utf-8')
             value = json.loads(value)
             return value
