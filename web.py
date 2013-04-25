@@ -85,8 +85,7 @@ class MainHandler(BaseHandler):
             # logging.info('oauth_token_secret; {}'.format(
             #     tumblr_auth.request_token['oauth_token_secret']))
 
-            # self.session['oauth_token'] = str(
-            #     tumblr_auth.request_token['oauth_token'])
+            self.session['oauth_token'] = oauth_token
             # self.session['oauth_token_secret'] = str(
             #     tumblr_auth.request_token['oauth_token_secret'])
 
