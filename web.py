@@ -104,8 +104,8 @@ class MainHandler(BaseHandler):
 class CallbackHandler(BaseHandler):
     def get(self):
         verifier = self.get_argument("oauth_verifier")
-        # token = self.get_argument("oauth_token")
-        token = self.session["oauth_token"]
+        token = self.get_argument("oauth_token")
+        # token = self.session["oauth_token"]
 
         logging.info('verifier; {}'.format(verifier))
         logging.info('token; {}'.format(token))

@@ -121,7 +121,7 @@ class Session(dict):
         value = self.handler.get_secure_cookie(key)
 
         if not value:
-            raise KeyError
+            raise KeyError('"{}" not in session'.format(key))
         else:
             value = value.decode('utf-8')
             value = json.loads(value)
