@@ -47,10 +47,9 @@ tumblr_auth = TumblrOAuthClient(
 class MainHandler(BaseHandler):
     def get(self):
 
-        access_key = self.session.get('access_key', None)
-        access_secret = self.session.get('access_secret', None)
+        is_authorized = self.session.get('is_authorized', None)
 
-        if not access_secret or not access_key:
+        if not is_authorized:
             """ Step 1 of the authentication workflow, obtain a temporary
             resource owner key and use it to redirect the user. The user
             will authorize the client (our flask app) to access its resources
@@ -136,6 +135,7 @@ class CallbackHandler(BaseHandler):
         # Flask session cookies are encrypted so we are ok.
         self.session["access_token"] = info["oauth_token"][0]
         self.session["token_secret"] = info["oauth_token_secret"][0]
+        self.session["is_authorized"] = True
 
         redirect_url = '/'
         if 'blog_name' in self.session:
