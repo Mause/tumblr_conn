@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import logging
+
 from oauthlib.common import extract_params
 from oauthlib.oauth1 import (Client, SIGNATURE_HMAC, SIGNATURE_TYPE_AUTH_HEADER)
 
@@ -51,6 +53,7 @@ class OAuth1(object):
         is_form_encoded = (CONTENT_TYPE_FORM_URLENCODED in content_type)
 
         if is_form_encoded or extract_params(r.body):
+            logging.debug('extract\'n dem parameters')
             r.headers['Content-Type'] = CONTENT_TYPE_FORM_URLENCODED
             r.url, r.headers, r.body = self.client.sign(
                 unicode(r.url), unicode(r.method), r.body or '', r.headers)
@@ -58,6 +61,8 @@ class OAuth1(object):
             # Omit body data in the signing of non form-encoded requests
             r.url, r.headers, _ = self.client.sign(
                 unicode(r.url), unicode(r.method), None, r.headers)
+            logging.info(r.url)
+            logging.info(r.headers)
 
         # Having the authorization header, key or value, in unicode will
         # result in UnicodeDecodeErrors when the request is concatenated
