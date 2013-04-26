@@ -83,8 +83,7 @@ class MainHandler(BaseHandler):
             #     tumblr_auth.request_token['oauth_token_secret']))
 
             self.session['oauth_token'] = oauth_token
-            # self.session['oauth_token_secret'] = str(
-            #     tumblr_auth.request_token['oauth_token_secret'])
+            self.session['oauth_token_secret'] = self.get_argument('oauth_token_secret')
 
             self.render('auth.html', auth_url=auth_url)
         else:
@@ -103,6 +102,9 @@ class CallbackHandler(BaseHandler):
         verifier = self.get_argument("oauth_verifier")
         token = self.get_argument("oauth_token")
 
+        logging.info(urllib.parse.parse_qs(self.request.query))
+        secret = self.session['oauth_token_secret']
+
         assert token == self.session['oauth_token'], 'trying to pull my leg?'
         # TODO; check if the next line resolves our problem
         # token = self.session["oauth_token"]
@@ -115,6 +117,7 @@ class CallbackHandler(BaseHandler):
             consumer_key,
             client_secret=consumer_secret,
             resource_owner_key=token,
+            resource_owner_secret=secret,
             verifier=verifier)
         r = requests.post(tumblr_auth.ACCESS_TOKEN_URL, auth=tumblr)
         requests.post('http://requestb.in/15molxv1', auth=tumblr)
