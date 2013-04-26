@@ -30,8 +30,8 @@ class OAuth2Session(requests.Session):
     """
 
     def __init__(self, client_id=None, client=None, auto_refresh_url=None,
-            auto_refresh_kwargs=None, scope=None, redirect_uri=None, token=None,
-            state=None, state_generator=None, token_updater=None, **kwargs):
+                 auto_refresh_kwargs=None, scope=None, redirect_uri=None, token=None,
+                 state=None, state_generator=None, token_updater=None, **kwargs):
         """Construct a new OAuth 2 client session.
 
         :param client_id: Client id obtained during registration
@@ -86,13 +86,13 @@ class OAuth2Session(requests.Session):
         """
         state = self.new_state()
         return self._client.prepare_request_uri(url,
-                redirect_uri=self.redirect_uri,
-                scope=self.scope,
-                state=state,
-                **kwargs), state
+                                                redirect_uri=self.redirect_uri,
+                                                scope=self.scope,
+                                                state=state,
+                                                **kwargs), state
 
     def fetch_token(self, token_url, code=None, authorization_response=None,
-            body='', username=None, password=None, **kwargs):
+                    body='', username=None, password=None, **kwargs):
         """Generic method for fetching an access token from the token endpoint.
 
         If you are using the MobileApplicationClient you will want to use
@@ -115,11 +115,12 @@ class OAuth2Session(requests.Session):
 
         if not code and authorization_response:
             self._client.parse_request_uri_response(authorization_response,
-                    state=self.state)
+                                                    state=self.state)
             code = self._client.code
-        body = self._client.prepare_request_body(code=code, body=body,
-                redirect_uri=self.redirect_uri, username=username,
-                password=password, **kwargs)
+        body = self._client.prepare_request_body(
+            code=code, body=body,
+            redirect_uri=self.redirect_uri, username=username,
+            password=password, **kwargs)
         # (ib-lundgren) All known, to me, token requests use POST.
         r = self.post(token_url, data=dict(urldecode(body)))
         self._client.parse_request_body_response(r.content, scope=self.scope)
@@ -133,7 +134,7 @@ class OAuth2Session(requests.Session):
         :return: A token dict
         """
         self._client.parse_request_uri_response(authorization_response,
-                state=self.state)
+                                                state=self.state)
         self.token = self._client.token
         return self.token
 
@@ -158,8 +159,8 @@ class OAuth2Session(requests.Session):
         self.token = {}
 
         kwargs.update(self.auto_refresh_kwargs)
-        body = self._client.prepare_refresh_body(body=body,
-                refresh_token=refresh_token, scope=self.scope, **kwargs)
+        body = self._client.prepare_refresh_body(
+            body=body, refresh_token=refresh_token, scope=self.scope, **kwargs)
         r = self.post(token_url, data=dict(urldecode(body)))
         self.token = self._client.parse_request_body_response(r.content, scope=self.scope)
         if not 'refresh_token' in self.token:
@@ -172,8 +173,8 @@ class OAuth2Session(requests.Session):
             raise InsecureTransportError()
         if self.token:
             try:
-                url, headers, data = self._client.add_token(url,
-                        http_method=method, body=data, headers=headers)
+                url, headers, data = self._client.add_token(
+                    url, http_method=method, body=data, headers=headers)
             # Attempt to retrieve and save new access token if expired
             except TokenExpiredError:
                 if self.auto_refresh_url:
@@ -185,5 +186,5 @@ class OAuth2Session(requests.Session):
                 else:
                     raise
 
-        return super(OAuth2Session, self).request(method, url,
-                headers=headers, data=data, **kwargs)
+        return super(OAuth2Session, self).request(
+            method, url, headers=headers, data=data, **kwargs)

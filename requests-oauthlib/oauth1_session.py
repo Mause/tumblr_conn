@@ -68,14 +68,14 @@ class OAuth1Session(requests.Session):
     """
 
     def __init__(self, client_key,
-            client_secret=None,
-            resource_owner_key=None,
-            resource_owner_secret=None,
-            callback_uri=None,
-            signature_method=SIGNATURE_HMAC,
-            signature_type=SIGNATURE_TYPE_AUTH_HEADER,
-            rsa_key=None,
-            verifier=None):
+                 client_secret=None,
+                 resource_owner_key=None,
+                 resource_owner_secret=None,
+                 callback_uri=None,
+                 signature_method=SIGNATURE_HMAC,
+                 signature_type=SIGNATURE_TYPE_AUTH_HEADER,
+                 rsa_key=None,
+                 verifier=None):
         """Construct the OAuth 1 session.
 
         :param client_key: A client specific identifier.
@@ -108,14 +108,14 @@ class OAuth1Session(requests.Session):
         """
         super(OAuth1Session, self).__init__()
         self._client = OAuth1(client_key,
-                client_secret=client_secret,
-                resource_owner_key=resource_owner_key,
-                resource_owner_secret=resource_owner_secret,
-                callback_uri=callback_uri,
-                signature_method=signature_method,
-                signature_type=signature_type,
-                rsa_key=rsa_key,
-                verifier=verifier)
+                              client_secret=client_secret,
+                              resource_owner_key=resource_owner_key,
+                              resource_owner_secret=resource_owner_secret,
+                              callback_uri=callback_uri,
+                              signature_method=signature_method,
+                              signature_type=signature_type,
+                              rsa_key=rsa_key,
+                              verifier=verifier)
         self.auth = self._client
 
     def authorization_url(self, url, request_token=None, **kwargs):

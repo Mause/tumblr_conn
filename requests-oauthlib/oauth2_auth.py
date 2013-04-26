@@ -29,6 +29,6 @@ class OAuth2(object):
         """
         if not r.url.startswith('https://'):
             raise InsecureTransportError()
-        r.url, r.headers, r.body = self._client.add_token(r.url,
-                http_method=r.method, body=r.body, headers=r.headers)
+        r.url, r.headers, r.body = self._client.add_token(
+            r.url, http_method=r.method, body=r.body, headers=r.headers)
         return r

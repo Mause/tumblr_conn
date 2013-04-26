@@ -10,20 +10,21 @@ import sys
 if sys.version > "3":
     unicode = str
 
+
 # OBS!: Correct signing of requests are conditional on invoking OAuth1
 # as the last step of preparing a request, or at least having the
 # content-type set properly.
 class OAuth1(object):
     """Signs the request using OAuth 1 (RFC5849)"""
     def __init__(self, client_key,
-            client_secret=None,
-            resource_owner_key=None,
-            resource_owner_secret=None,
-            callback_uri=None,
-            signature_method=SIGNATURE_HMAC,
-            signature_type=SIGNATURE_TYPE_AUTH_HEADER,
-            rsa_key=None, verifier=None,
-            decoding='utf-8'):
+                 client_secret=None,
+                 resource_owner_key=None,
+                 resource_owner_secret=None,
+                 callback_uri=None,
+                 signature_method=SIGNATURE_HMAC,
+                 signature_type=SIGNATURE_TYPE_AUTH_HEADER,
+                 rsa_key=None, verifier=None,
+                 decoding='utf-8'):
 
         try:
             signature_type = signature_type.upper()
@@ -31,8 +32,8 @@ class OAuth1(object):
             pass
 
         self.client = Client(client_key, client_secret, resource_owner_key,
-            resource_owner_secret, callback_uri, signature_method,
-            signature_type, rsa_key, verifier, decoding=decoding)
+                             resource_owner_secret, callback_uri, signature_method,
+                             signature_type, rsa_key, verifier, decoding=decoding)
 
     def __call__(self, r):
         """Add OAuth parameters to the request.
