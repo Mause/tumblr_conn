@@ -138,9 +138,9 @@ class CallbackHandler(BaseHandler):
         self.session["token_secret"] = info["oauth_token_secret"][0]
 
         redirect_url = '/'
-        if self.session['blog_name']:
-            redirect_url += '?' + urllib.parse.urlencode({
-                'blog_name': self.session['blog_name']})
+        if 'blog_name' in self.session:
+            redirect_url += '?' + urllib.parse.urlencode(
+                {'blog_name': self.session['blog_name']})
 
         self.redirect(redirect_url)
 
