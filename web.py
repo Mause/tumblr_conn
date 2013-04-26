@@ -172,7 +172,7 @@ class AnalyseHandler(BaseHandler):
 
 
 settings = {
-    'cookie_secret': 'key_kay_wooookoo',
+    'cookie_secret': '7e442e29bd724847bfbebc51e59850259edc6d3aadd94bcbab3c8d765db90e3bd4c9bcee4f9c43729c068391e17bd702',
     "static_path": os.path.join(os.path.dirname(__file__), "static"),
     "template_path": os.path.join(os.path.dirname(__file__), 'templates'),
     "debug": True,
