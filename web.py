@@ -126,7 +126,7 @@ class CallbackHandler(BaseHandler):
 
         if 'oauth_token' not in info:
             self.write(r.text)
-            self.write('<br/>'.format(r))
+            self.write('<br/>'.format(repr(r)))
             self.write('<br/>verifier; {}'.format(verifier))
             self.write('<br/>resource_owner_key; {}'.format(token))
             self.write('<br/>oauth_token in session; {}'.format(self.session['oauth_token']))

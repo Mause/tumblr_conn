@@ -68,10 +68,10 @@ class OAuth1(object):
         # >>> d['a'] = 'foo'
         # >>> d
         # { u'a' : 'foo' }
-        u_header = unicode('Authorization')
-        if u_header in r.headers:
-            auth_header = r.headers[u_header].encode('utf-8')
-            del r.headers[u_header]
-            r.headers['Authorization'] = auth_header
+        # u_header = unicode('Authorization')
+        # if u_header in r.headers:
+        #     auth_header = r.headers[u_header].encode('utf-8')
+        #     del r.headers[u_header]
+        #     r.headers['Authorization'] = auth_header
 
         return r
