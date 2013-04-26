@@ -101,16 +101,11 @@ class CallbackHandler(BaseHandler):
     def get(self):
         verifier = self.get_argument("oauth_verifier")
         token = self.get_argument("oauth_token")
-
-        logging.info(urllib.parse.parse_qs(self.request.query))
         secret = self.session['oauth_token_secret']
-
-        assert token == self.session['oauth_token'], 'trying to pull my leg?'
-        # TODO; check if the next line resolves our problem
-        # token = self.session["oauth_token"]
 
         logging.info('verifier; {}'.format(verifier))
         logging.info('token; {}'.format(token))
+        logging.info('secret; {}'.format(secret))
 
         # In this step we also use the verifier
         tumblr = OAuth1(
@@ -127,14 +122,9 @@ class CallbackHandler(BaseHandler):
         # as well as some extra information such as screen name.
         info = urllib.parse.parse_qs(r.content)
 
+        logging.info(info)
         if 'oauth_token' not in info:
-            self.write(r.text)
-            self.write('<br/>'.format(repr(r)))
-            self.write('<br/>verifier; {}'.format(verifier))
-            self.write('<br/>resource_owner_key; {}'.format(token))
-            self.write('<br/>oauth_token in session; {}'.format(self.session['oauth_token']))
-            self.write('<br/>client_secret; {}'.format(consumer_secret))
-            self.write('<br/>client_key; {}'.format(consumer_key))
+            self.redirect('/')
             return
 
         assert 'oauth_token' in info, r.text
