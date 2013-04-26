@@ -159,10 +159,10 @@ class ForceGraphDataHandler(BaseHandler):
 
 class AnalyseHandler(BaseHandler):
     def get(self):
-        if self.session['blog_name']:
-            self.render(
-                'analyse.html',
-                blog_name=self.session['blog_name'])
+        is_authorized = self.session.get('is_authorized', None)
+        if is_authorized:
+            blog_name = self.session['blog_name']
+            self.render('analyse.html', blog_name=blog_name)
         else:
             self.redirect('/')
 
