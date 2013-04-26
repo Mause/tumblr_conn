@@ -122,6 +122,15 @@ class CallbackHandler(BaseHandler):
         # as well as some extra information such as screen name.
         info = urllib.parse.parse_qs(r.content)
 
+        if 'oauth_token' not in info:
+            self.write(r.text)
+            self.write('<br/>verifier; {}'.format(verifier))
+            self.write('<br/>resource_owner_key; {}'.format(token))
+            self.write('<br/>oauth_token in session; {}'.format(self.session['oauth_token']))
+            self.write('<br/>client_secret; {}'.format(consumer_secret))
+            self.write('<br/>client_key; {}'.format(consumer_key))
+            return
+
         assert 'oauth_token' in info, r.text
         assert 'oauth_token_secret' in info, r.text
 
