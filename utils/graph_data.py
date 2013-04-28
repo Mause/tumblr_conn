@@ -25,8 +25,11 @@ from itertools import chain
 from utils.iron_wrap import memcache
 
 
-def process_graph_data(handler, processing_function):
-    blog_name = handler.get_argument('blog_name')
+def process_d3_points(blog_name):
+    return process_graph_data(blog_name, processing_function=compute_d3_points)
+
+
+def process_graph_data(blog_name, processing_function):
     output_json = {'nodes': [], 'links': []}
 
     if blog_name:
@@ -54,8 +57,7 @@ def process_graph_data(handler, processing_function):
 
             output_json = processing_function(all_data)
 
-    return json.dumps(
-        output_json)
+    return output_json
 
 
 def compute_d3_points(relations):

@@ -33,8 +33,8 @@ import ajax
 import debug
 from utils import BaseHandler
 from utils.url import expand_hostname
+from utils.graph_data import process_d3_points
 from auth_data import consumer_key, consumer_secret
-from utils.graph_data import compute_d3_points, process_graph_data
 
 sys.argv.append('--logging=DEBUG')
 tornado.options.parse_command_line()
@@ -153,13 +153,13 @@ class ForceGraphHandler(BaseHandler):
 
 class ForceGraphDataHandler(BaseHandler):
     def get(self):
-        self.write(
-            process_graph_data(self, processing_function=compute_d3_points))
+        blog_name = self.get_argument('blog_name')
+        self.write(process_d3_points(blog_name))
 
 
 class AnalyseHandler(BaseHandler):
     def get(self):
-        is_authorized = self.session.get('is_authorized', None)
+        is_authorized = self.session.get('is_authorized', default=False)
         if is_authorized:
             blog_name = self.session['blog_name']
             self.render('analyse.html', blog_name=blog_name)
