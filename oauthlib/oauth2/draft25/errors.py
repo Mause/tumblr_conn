@@ -195,6 +195,6 @@ def raise_from_error(error, params=None):
         'uri': params.get('error_uri'),
         'state': params.get('state')
     }
-    for _, cls in  inspect.getmembers(sys.modules[__name__], inspect.isclass):
+    for _, cls in inspect.getmembers(sys.modules[__name__], inspect.isclass):
         if cls.error == error:
             raise cls(**kwargs)

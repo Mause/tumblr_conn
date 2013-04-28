@@ -2,7 +2,7 @@ import os
 import mimetypes
 import zipfile
 from dateutil.tz import *
-import iron_core
+from . import iron_core
 try:
     import json
 except ImportError:

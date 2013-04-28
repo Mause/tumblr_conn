@@ -27,7 +27,7 @@ import urllib.parse
 with open(os.path.join(os.path.dirname(__file__), 'countries.json')) as fh:
     COUNTRIES = json.load(fh)
     TLDS = {country['tld'].lower()[1:] for country in COUNTRIES}
-# pprint(TLDS)
+
 
 TLDS.update([
     # top level domain extensions

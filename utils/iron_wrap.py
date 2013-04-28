@@ -20,8 +20,8 @@
 import json
 
 # third party
-import iron_mq
-import iron_cache
+from ironio import iron_mq
+from ironio import iron_cache
 
 
 # IronCache

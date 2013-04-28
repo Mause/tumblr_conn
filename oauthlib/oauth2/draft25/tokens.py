@@ -23,8 +23,8 @@ from . import utils
 
 
 def prepare_mac_header(token, uri, key, http_method, nonce=None, headers=None,
-        body=None, ext='', hash_algorithm='hmac-sha-1', issue_time=None,
-        draft=0):
+                       body=None, ext='', hash_algorithm='hmac-sha-1', issue_time=None,
+                       draft=0):
     """Add an `MAC Access Authentication`_ signature to headers.
 
     Unlike OAuth 1, this HMAC signature does not require inclusion of the request
@@ -195,7 +195,7 @@ class BearerToken(TokenBase):
 
         if refresh_token:
             token['refresh_token'] = self.token_generator(
-                    request, refresh_token=True)
+                request, refresh_token=True)
 
         token.update(request.extra_credentials or {})
 

@@ -1,4 +1,4 @@
-import iron_core
+from . import iron_core
 import urllib.parse
 try:
     import json
