@@ -78,7 +78,7 @@ def prepare_headers(oauth_params, headers=None, realm=None):
     if realm:
         # NOTE: realm should *not* be escaped
         authorization_header_parameters = ('realm="%s", ' % realm +
-            authorization_header_parameters)
+                                           authorization_header_parameters)
 
     # the auth-scheme name set to "OAuth" (case insensitive).
     authorization_header = 'OAuth %s' % authorization_header_parameters

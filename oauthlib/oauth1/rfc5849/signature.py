@@ -31,11 +31,11 @@ except ImportError:
     import urllib.parse as urlparse
 from . import utils
 from oauthlib.common import urldecode, extract_params, safe_string_equals
-from oauthlib.common import bytes_type, unicode_type
+from oauthlib.common import unicode_type
 
 
 def construct_base_string(http_method, base_string_uri,
-        normalized_encoded_request_parameters):
+                          normalized_encoded_request_parameters):
     """**String Construction**
     Per `section 3.4.1.1`_ of the spec.
 
@@ -172,7 +172,7 @@ def normalize_base_string_uri(uri):
 #    .. _`section 3.4.1.3`: http://tools.ietf.org/html/rfc5849#section-3.4.1.3
 
 def collect_parameters(uri_query='', body=[], headers=None,
-        exclude_oauth_signature=True, with_realm=False):
+                       exclude_oauth_signature=True, with_realm=False):
     """**Parameter Sources**
 
     Parameters starting with `oauth_` will be unescaped.
@@ -289,7 +289,7 @@ def collect_parameters(uri_query='', body=[], headers=None,
     # base string if present.
     if exclude_oauth_signature:
         unescaped_params = list(filter(lambda i: i[0] != 'oauth_signature',
-            unescaped_params))
+                                unescaped_params))
 
     return unescaped_params
 
@@ -508,7 +508,7 @@ def sign_plaintext(client_secret, resource_owner_secret):
 
 
 def verify_hmac_sha1(request, client_secret=None,
-    resource_owner_secret=None):
+                     resource_owner_secret=None):
     """Verify a HMAC-SHA1 signature.
 
     Per `section 3.4`_ of the spec.
@@ -519,7 +519,7 @@ def verify_hmac_sha1(request, client_secret=None,
     uri = normalize_base_string_uri(request.uri)
     base_string = construct_base_string(request.http_method, uri, norm_params)
     signature = sign_hmac_sha1(base_string, client_secret,
-        resource_owner_secret)
+                               resource_owner_secret)
     return safe_string_equals(signature, request.signature)
 
 

@@ -14,7 +14,7 @@ try:
 except ImportError:
     import urllib.request as urllib2
 
-from oauthlib.common import quote, unquote, bytes_type, unicode_type
+from oauthlib.common import quote, unquote, unicode_type
 
 UNICODE_ASCII_CHARACTER_SET = ('abcdefghijklmnopqrstuvwxyz'
                                'ABCDEFGHIJKLMNOPQRSTUVWXYZ'

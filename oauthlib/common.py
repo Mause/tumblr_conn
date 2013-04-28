@@ -336,7 +336,7 @@ class Request(object):
     """
 
     def __init__(self, uri, http_method='GET', body=None, headers=None,
-            encoding='utf-8'):
+                 encoding='utf-8'):
         # Convert to unicode using encoding if given, else assume unicode
         encode = lambda x: to_unicode(x, encoding) if encoding else x
 

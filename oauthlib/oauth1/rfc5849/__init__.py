@@ -43,15 +43,15 @@ CONTENT_TYPE_FORM_URLENCODED = 'application/x-www-form-urlencoded'
 class Client(object):
     """A client used to sign OAuth 1.0 RFC 5849 requests"""
     def __init__(self, client_key,
-            client_secret=None,
-            resource_owner_key=None,
-            resource_owner_secret=None,
-            callback_uri=None,
-            signature_method=SIGNATURE_HMAC,
-            signature_type=SIGNATURE_TYPE_AUTH_HEADER,
-            rsa_key=None, verifier=None, realm=None,
-            encoding='utf-8', decoding=None,
-            nonce=None, timestamp=None):
+                 client_secret=None,
+                 resource_owner_key=None,
+                 resource_owner_secret=None,
+                 callback_uri=None,
+                 signature_method=SIGNATURE_HMAC,
+                 signature_type=SIGNATURE_TYPE_AUTH_HEADER,
+                 rsa_key=None, verifier=None, realm=None,
+                 encoding='utf-8', decoding=None,
+                 nonce=None, timestamp=None):
         """Create an OAuth 1 client.
 
         :param client_key: Client key (consumer key), mandatory.
@@ -101,7 +101,7 @@ class Client(object):
         if self.signature_method == SIGNATURE_PLAINTEXT:
             # fast-path
             return signature.sign_plaintext(self.client_secret,
-                self.resource_owner_secret)
+                                            self.resource_owner_secret)
 
         uri, headers, body = self._render(request)
 
@@ -117,18 +117,18 @@ class Client(object):
         log.debug("Normalized URI: {0}".format(normalized_uri))
 
         base_string = signature.construct_base_string(request.http_method,
-            normalized_uri, normalized_params)
+                                                      normalized_uri, normalized_params)
 
         log.debug("Base signing string: {0}".format(base_string))
 
         if self.signature_method == SIGNATURE_HMAC:
             sig = signature.sign_hmac_sha1(base_string, self.client_secret,
-                self.resource_owner_secret)
+                                           self.resource_owner_secret)
         elif self.signature_method == SIGNATURE_RSA:
             sig = signature.sign_rsa_sha1(base_string, self.rsa_key)
         else:
             sig = signature.sign_plaintext(self.client_secret,
-                self.resource_owner_secret)
+                                           self.resource_owner_secret)
 
         log.debug("Signature: {0}".format(sig))
         return sig
@@ -275,7 +275,7 @@ class Client(object):
 
         # render the signed request and return it
         uri, headers, body = self._render(request, formencode=True,
-                realm=(realm or self.realm))
+                                          realm=(realm or self.realm))
 
         if self.decoding:
             log.debug('Encoding URI, headers and body to %s.', self.decoding)
@@ -577,11 +577,11 @@ class Server(object):
         """
         # Per RFC5849, only the Authorization header may contain the 'realm' optional parameter.
         header_params = signature.collect_parameters(headers=request.headers,
-                exclude_oauth_signature=False, with_realm=True)
+                                                     exclude_oauth_signature=False, with_realm=True)
         body_params = signature.collect_parameters(body=request.body,
-                exclude_oauth_signature=False)
+                                                   exclude_oauth_signature=False)
         query_params = signature.collect_parameters(uri_query=request.uri_query,
-                exclude_oauth_signature=False)
+                                                    exclude_oauth_signature=False)
 
         params = []
         params.extend(header_params)
@@ -682,7 +682,7 @@ class Server(object):
         raise NotImplementedError("Subclasses must implement this function.")
 
     def validate_timestamp_and_nonce(self, client_key, timestamp, nonce,
-        request_token=None, access_token=None):
+                                     request_token=None, access_token=None):
         """Validates that the nonce has not been used before.
 
         Per `Section 3.3`_ of the spec.
@@ -749,7 +749,7 @@ class Server(object):
         raise NotImplementedError("Subclasses must implement this function.")
 
     def validate_realm(self, client_key, access_token, uri=None,
-            required_realm=None):
+                       required_realm=None):
         """Validates access to the request realm.
 
         How providers choose to use the realm parameter is outside the OAuth
@@ -783,29 +783,29 @@ class Server(object):
         raise NotImplementedError("Subclasses must implement this function.")
 
     def verify_request_token_request(self, uri, http_method='GET', body=None,
-            headers=None):
+                                     headers=None):
         """Verify the initial request in the OAuth workflow.
 
         During this step the client obtains a request token for use during
         resource owner authorization (which is outside the scope of oauthlib).
         """
         return self.verify_request(uri, http_method=http_method, body=body,
-                headers=headers, require_resource_owner=False,
-                require_realm=True, require_callback=True)
+                                   headers=headers, require_resource_owner=False,
+                                   require_realm=True, require_callback=True)
 
     def verify_access_token_request(self, uri, http_method='GET', body=None,
-            headers=None):
+                                    headers=None):
         """Verify the second request in the OAuth workflow.
 
         During this step the client obtains the access token for use when
         accessing protected resources.
         """
         return self.verify_request(uri, http_method=http_method, body=body,
-                headers=headers, require_verifier=True)
+                                   headers=headers, require_verifier=True)
 
     def verify_request(self, uri, http_method='GET', body=None,
-            headers=None, require_resource_owner=True, require_verifier=False,
-            require_realm=False, required_realm=None, require_callback=False):
+                       headers=None, require_resource_owner=True, require_verifier=False,
+                       require_realm=False, required_realm=None, require_callback=False):
         """Verifies a request ensuring that the following is true:
 
         Per `section 3.2`_ of the spec.
@@ -886,7 +886,7 @@ class Server(object):
         #   If the "oauth_version" parameter is present, ensuring its value is
         #   "1.0".
         if ('oauth_version' in request.oauth_params and
-            request.oauth_params['oauth_version'] != '1.0'):
+                request.oauth_params['oauth_version'] != '1.0'):
             raise ValueError("Invalid OAuth version.")
 
         # The timestamp value MUST be a positive integer. Unless otherwise
@@ -916,11 +916,11 @@ class Server(object):
             raise ValueError("Missing resource owner.")
 
         if (require_resource_owner and not require_verifier and
-            not self.check_access_token(request.resource_owner_key)):
+                not self.check_access_token(request.resource_owner_key)):
             raise ValueError("Invalid resource owner key.")
 
         if (require_resource_owner and require_verifier and
-            not self.check_request_token(request.resource_owner_key)):
+                not self.check_request_token(request.resource_owner_key)):
             raise ValueError("Invalid resource owner key.")
 
         if not self.check_nonce(request.nonce):
@@ -953,7 +953,7 @@ class Server(object):
         else:
             token = {"access_token": request.resource_owner_key}
         if not self.validate_timestamp_and_nonce(request.client_key,
-                request.timestamp, request.nonce, **token):
+                                                 request.timestamp, request.nonce, **token):
                 return False, request
 
         # The server SHOULD return a 401 (Unauthorized) status code when
@@ -972,7 +972,7 @@ class Server(object):
         # .._`Section 2.1`: http://tools.ietf.org/html/rfc5849#section-2.1
         if require_callback:
             valid_redirect = self.validate_redirect_uri(request.client_key,
-                    request.callback_uri)
+                                                        request.callback_uri)
         else:
             valid_redirect = True
 
@@ -1020,15 +1020,16 @@ class Server(object):
         # that the realm is now tied to the access token and not provided by
         # the client.
         if ((require_realm and not request.resource_owner_key) or
-            (not require_resource_owner and not request.realm)):
+                (not require_resource_owner and not request.realm)):
             valid_realm = self.validate_requested_realm(request.client_key,
-                    request.realm)
+                                                        request.realm)
         elif require_verifier:
             valid_realm = True
         else:
             valid_realm = self.validate_realm(request.client_key,
-                    request.resource_owner_key, uri=request.uri,
-                    required_realm=required_realm)
+                                              request.resource_owner_key,
+                                              uri=request.uri,
+                                              required_realm=required_realm)
 
         # The server MUST verify (Section 3.2) the validity of the request,
         # ensure that the resource owner has authorized the provisioning of
@@ -1041,7 +1042,8 @@ class Server(object):
         # verifier enumertion.
         if request.verifier:
             valid_verifier = self.validate_verifier(request.client_key,
-                request.resource_owner_key, request.verifier)
+                                                    request.resource_owner_key,
+                                                    request.verifier)
         else:
             valid_verifier = True
 
@@ -1076,18 +1078,21 @@ class Server(object):
 
             if request.signature_method == SIGNATURE_HMAC:
                 valid_signature = signature.verify_hmac_sha1(request,
-                    client_secret, resource_owner_secret)
+                                                             client_secret,
+                                                             resource_owner_secret)
             else:
                 valid_signature = signature.verify_plaintext(request,
-                    client_secret, resource_owner_secret)
+                                                             client_secret,
+                                                             resource_owner_secret)
 
         # We delay checking validity until the very end, using dummy values for
         # calculations and fetching secrets/keys to ensure the flow of every
         # request remains almost identical regardless of whether valid values
         # have been supplied. This ensures near constant time execution and
         # prevents malicious users from guessing sensitive information
-        v = all((valid_client, valid_resource_owner, valid_realm,
-                    valid_redirect, valid_verifier, valid_signature))
+        v = all((
+            valid_client, valid_resource_owner, valid_realm,
+            valid_redirect, valid_verifier, valid_signature))
         if not v:
             log.info("[Failure] OAuthLib request verification failed.")
             log.info("Valid client:\t%s" % valid_client)
