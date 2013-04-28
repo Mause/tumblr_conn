@@ -46,7 +46,6 @@ tumblr_auth = TumblrOAuthClient(
 
 class MainHandler(BaseHandler):
     def get(self):
-
         is_authorized = self.session.get('is_authorized', None)
 
         if not is_authorized:
@@ -66,7 +65,9 @@ class MainHandler(BaseHandler):
 
             # Extract the temporary resource owner key from the response
             info = urllib.parse.parse_qs(r.text)
-            assert 'oauth_token' in info, info
+
+            assert 'oauth_token' in info, r.text
+            assert info['oauth_callback_confirmed'][0] == 'true'
 
             logging.info(info)
             oauth_token = info["oauth_token"][0]
@@ -76,11 +77,6 @@ class MainHandler(BaseHandler):
             auth_url = tumblr_auth.AUTHORIZE_URL + '?' + urllib.parse.urlencode({"oauth_token": oauth_token})
 
             self.session['blog_name'] = self.get_argument('blog_name', None)
-
-            logging.info('oauth_token; {}'.format(oauth_token))
-            # logging.info('oauth_token_secret; {}'.format(
-            #     tumblr_auth.request_token['oauth_token_secret']))
-
             self.session['oauth_token'] = oauth_token
             self.session['oauth_token_secret'] = info['oauth_token_secret'][0]
 
@@ -102,9 +98,9 @@ class CallbackHandler(BaseHandler):
         token = self.get_argument("oauth_token")
         secret = self.session['oauth_token_secret']
 
-        logging.info('verifier; {}'.format(verifier))
-        logging.info('token; {}'.format(token))
-        logging.info('secret; {}'.format(secret))
+        logging.debug('verifier; {}'.format(verifier))
+        logging.debug('token; {}'.format(token))
+        logging.debug('secret; {}'.format(secret))
 
         # In this step we also use the verifier
         tumblr = OAuth1(

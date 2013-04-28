@@ -23,19 +23,14 @@ import logging
 import urllib.parse
 # from pprint import pprint
 
-# countries.json from https://raw.github.com/mledoze/countries/master/countries.json
-with open(os.path.join(os.path.dirname(__file__), 'countries.json')) as fh:
-    COUNTRIES = json.load(fh)
-    TLDS = {country['tld'].lower()[1:] for country in COUNTRIES}
 
-
-TLDS.update([
-    # top level domain extensions
-    'com', 'co', 'net', 'org', 'edu', 'gov',
-
-    # specials
-    'info', 'name',
-])
+# tld data from http://en.wikipedia.org/wiki/List_of_Internet_top-level_domains#Generic_top-level_domains
+TLD_DATA_FOLDER = os.path.join(os.path.dirname(__file__), 'tld_data')
+with open(os.path.join(TLD_DATA_FOLDER, 'country_based.json')) as fh:
+    COUNTRY_BASED_TLDS = json.load(fh)
+with open(os.path.join(TLD_DATA_FOLDER, 'generic.json')) as fh:
+    GENERIC_TLDS = json.load(fh)
+TLDS = {tld.lower()[1:] for tld in COUNTRY_BASED_TLDS + GENERIC_TLDS}
 
 
 def is_url(string):
@@ -52,7 +47,6 @@ def is_url(string):
 
 
 def expand_hostname(hostname):
-    # logging.debug('Expanding hostname; "{}"'.format(hostname))
     if hostname.endswith('.tumblr.com'):
         return
 
@@ -72,7 +66,6 @@ def main():
     logging.info = print
     while True:
         print(is_url(input('URL; ')))
-        # print(expand_hostname(input()))
 
 if __name__ == '__main__':
     main()
