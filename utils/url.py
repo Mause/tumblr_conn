@@ -17,15 +17,25 @@
 "url manipulation and verification"
 
 # stdlib
+import os
 import json
 import logging
 import urllib.parse
-
+# from pprint import pprint
 
 # countries.json from https://raw.github.com/mledoze/countries/master/countries.json
-with open('countries.json') as fh:
+with open(os.path.join(os.path.dirname(__file__), 'countries.json')) as fh:
     COUNTRIES = json.load(fh)
-    TLDS = {country['tld'] for country in COUNTRIES}
+    TLDS = {country['tld'].lower()[1:] for country in COUNTRIES}
+# pprint(TLDS)
+
+TLDS.update([
+    # top level domain extensions
+    'com', 'co', 'net', 'org', 'edu', 'gov',
+
+    # specials
+    'info', 'name',
+])
 
 
 def is_url(string):
@@ -33,7 +43,7 @@ def is_url(string):
         string = 'http://' + string
 
     netloc = urllib.parse.urlsplit(string).netloc
-    # logging.debug('netloc; "{}"'.format(netloc))
+
     if netloc.split('.')[-1] in TLDS:
         # eh, good enough
         return True
