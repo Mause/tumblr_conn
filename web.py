@@ -116,8 +116,6 @@ class CallbackHandler(BaseHandler):
         # as well as some extra information such as screen name.
         info = urllib.parse.parse_qs(r.text)
 
-        logging.info(info)
-        logging.info(type(info))
         if 'oauth_token' not in info:
             logging.warning('"oauth_token" not in info, redirecting to homepage')
             self.redirect('/')
@@ -138,7 +136,7 @@ class CallbackHandler(BaseHandler):
         if 'blog_name' in self.session:
             redirect_url += '?' + urllib.parse.urlencode(
                 {'blog_name': self.session['blog_name']})
-        logging.warning('REDIRECT_URL; {}'.format(redirect_url))
+
         self.redirect(redirect_url)
 
 
