@@ -69,7 +69,7 @@ class IronCache:
                    http://dev.iron.io/cache/reference/api/#list_caches for more
                    information on defaults and possible values.
         """
-        query = urllib.urlencode(options)
+        query = urllib.parse.urlencode(options)
         url = "caches"
         if query != "":
             url = "%s?%s" % (url, query)
@@ -89,8 +89,8 @@ class IronCache:
             cache = self.name
         if cache is None:
             raise ValueError("Cache name must be set")
-        cache = urllib.quote_plus(cache)
-        key = urllib.quote_plus(key)
+        cache = urllib.parse.quote_plus(cache)
+        key = urllib.parse.quote_plus(key)
         url = "caches/%s/items/%s" % (cache, key)
         result = self.client.get(url)
         return Item(values=result["body"])
@@ -140,8 +140,8 @@ class IronCache:
             cache = self.name
         if cache is None:
             raise ValueError("Cache name must be set")
-        cache = urllib.quote_plus(cache)
-        key = urllib.quote_plus(key)
+        cache = urllib.parse.quote_plus(cache)
+        key = urllib.parse.quote_plus(key)
 
         self.client.delete("caches/%s/items/%s" % (cache, key))
 
@@ -162,8 +162,8 @@ class IronCache:
             cache = self.name
         if cache is None:
             raise ValueError("Cache name must be set")
-        cache = urllib.quote_plus(cache)
-        key = urllib.quote_plus(key)
+        cache = urllib.parse.quote_plus(cache)
+        key = urllib.parse.quote_plus(key)
 
         body = json.dumps({"amount": amount})
 
