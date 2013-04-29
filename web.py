@@ -57,7 +57,8 @@ class MainHandler(BaseHandler):
             # In this step you will need to supply your twitter
             # provided key and secret
             tumblr = OAuth1(consumer_key,
-                            client_secret=consumer_secret)
+                            client_secret=consumer_secret,
+                            decoding=None)
 
             # We will be using the default method of
             # supplying parameters, which is in the authorization header.
