@@ -31,7 +31,7 @@ class MemcacheContainer(object):
 
     def __getitem__(self, cache_name):
         if cache_name not in self.caches:
-            self.caches[cache_name] = iron_cache.IronCache(cache_name)
+            self.caches[cache_name] = iron_cache.IronCache()
         return self.caches[cache_name]
 memcache = MemcacheContainer()
 
