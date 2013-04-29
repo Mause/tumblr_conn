@@ -36,7 +36,7 @@ from utils.url import expand_hostname
 from utils.graph_data import process_d3_points
 from auth_data import consumer_key, consumer_secret
 
-sys.argv.append('--logging=DEBUG')
+sys.argv.append('--logging=INFO')
 tornado.options.parse_command_line()
 
 tumblr_auth = TumblrOAuthClient(
@@ -111,7 +111,6 @@ class CallbackHandler(BaseHandler):
             resource_owner_secret=secret,
             verifier=verifier)
         r = requests.post(tumblr_auth.ACCESS_TOKEN_URL, auth=tumblr)
-        requests.post('http://requestb.in/15molxv1', auth=tumblr)
 
         # This is the end of Step 3,
         # we can now extract resource owner key & secret
