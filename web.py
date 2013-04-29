@@ -94,6 +94,7 @@ class MainHandler(BaseHandler):
 
 class CallbackHandler(BaseHandler):
     def get(self):
+        logging.warning('CALLBACK RECIEVED')
         verifier = self.get_argument("oauth_verifier")
         token = self.get_argument("oauth_token")
         secret = self.session['oauth_token_secret']
@@ -137,7 +138,7 @@ class CallbackHandler(BaseHandler):
         if 'blog_name' in self.session:
             redirect_url += '?' + urllib.parse.urlencode(
                 {'blog_name': self.session['blog_name']})
-
+        logging.warning('REDIRECT_URL; {}'.format(redirect_url))
         self.redirect(redirect_url)
 
 
