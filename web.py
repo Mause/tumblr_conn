@@ -69,7 +69,6 @@ class MainHandler(BaseHandler):
             assert 'oauth_token' in info, r.text
             assert info['oauth_callback_confirmed'][0] == 'true'
 
-            logging.info(info)
             oauth_token = info["oauth_token"][0]
 
             # Create the redirection url and send the user to twitter
@@ -115,10 +114,12 @@ class CallbackHandler(BaseHandler):
         # This is the end of Step 3,
         # we can now extract resource owner key & secret
         # as well as some extra information such as screen name.
-        info = urllib.parse.parse_qs(r.content)
+        info = urllib.parse.parse_qs(r.text)
 
         logging.info(info)
+        logging.info(type(info))
         if 'oauth_token' not in info:
+            logging.warning('"oauth_token" not in info, redirecting to homepage')
             self.redirect('/')
             return
 
