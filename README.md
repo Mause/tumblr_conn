@@ -18,10 +18,6 @@ Currently working towards having it run properly on Heroku, python-3.3.0.
 As stated in requirements.txt;
  * requests==1.1.0
  * tornado==2.4.1
- * pyzmq==13.0.2
-
-Though whether or not the final implementation will use pyzmq is... debatable.
-As it stands, pyzqm is not used at all.
 
 ## Implementation details
 
@@ -62,4 +58,4 @@ limitations under the License.
 
 
 ## Postscript;
- * Had a bit of trouble with the Tumblr api complaining about invalid signatures; if you get the same thing, make sure you pass the `resource_owner_secret` argument to the `requests_oauthlib.OAuth1` class
+ * Had a bit of trouble with the Tumblr api complaining about invalid signatures; if you get the same thing, make sure you pass the `resource_owner_secret` argument to the `requests_oauthlib.OAuth1` class in the callback

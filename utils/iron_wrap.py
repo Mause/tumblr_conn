@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"Iron wrappers"
+"IronIO API wrappers"
 
-# stdlibs
+# stdlib
 import json
 
 # third party
