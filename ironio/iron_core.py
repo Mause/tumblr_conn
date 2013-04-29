@@ -1,6 +1,7 @@
 import time
 from datetime import datetime
 import os
+import logging
 import iso8601
 import requests
 try:
@@ -151,6 +152,7 @@ class IronClient:
                 r = self._doRequest(url, method, body, headers)
 
         if r.status_code >= 400:
+            logging.warning(r.text)
             r.raise_for_status()
 
         result = {}

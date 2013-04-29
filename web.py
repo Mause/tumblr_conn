@@ -98,6 +98,8 @@ class CallbackHandler(BaseHandler):
         token = self.get_argument("oauth_token")
         secret = self.session['oauth_token_secret']
 
+        # self.session.delete('oauth_token_secret')
+
         logging.debug('verifier; {}'.format(verifier))
         logging.debug('token; {}'.format(token))
         logging.debug('secret; {}'.format(secret))
